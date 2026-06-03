@@ -1,0 +1,10 @@
+{
+  "id": 3,
+  "name": "anomaly_detection",
+  "model": "ztf_autoencoder",
+  "dataset": "https://ztf.uw.edu/",
+  "active": true,
+  "description": "Detect anomalies in ZTF transient alert stream",
+  "compute_profile": "autoencoder",
+  "reward_multiplier": 1.5
+}

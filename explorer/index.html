@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voidmap Explorer</title>
+<style>
+:root{--bg:#0a0a1a;--bg2:#12122a;--fg:#e0e0ff;--fg2:#6666aa;--accent:#7c5cfc;--accent2:#00d4aa;--red:#ff6b6b;--green:#51cf66}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;border-bottom:1px solid rgba(255,255,255,0.06)}
+nav .logo{font-size:1.25rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav a{color:var(--fg2);text-decoration:none;font-size:0.9rem}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1.25rem}
+.stat-card .l{color:var(--fg2);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em}
+.stat-card .v{font-size:1.5rem;font-weight:700;margin-top:0.25rem}
+.stat-card .c{font-size:0.8rem;margin-top:0.25rem}
+h3{margin:2rem 0 1rem;font-size:1.1rem}
+table{width:100%;border-collapse:collapse;font-size:0.9rem}
+th{text-align:left;padding:0.6rem 0.8rem;color:var(--fg2);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.06)}
+td{padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,255,255,0.03);font-family:monospace}
+.hash{color:var(--accent2)}
+.addr{color:var(--accent)}
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.75rem;font-weight:600}
+.b-b{background:rgba(124,92,252,0.2);color:var(--accent)}
+.b-g{background:rgba(0,212,170,0.2);color:var(--accent2)}
+.b-r{background:rgba(255,107,107,0.2);color:var(--red)}
+.pag{display:flex;justify-content:center;gap:0.5rem;margin-top:2rem}
+.pag button{background:var(--bg2);border:1px solid rgba(255,255,255,0.1);color:var(--fg);padding:0.4rem 0.8rem;border-radius:6px;cursor:pointer;font-size:0.85rem}
+.pag button:hover{border-color:var(--accent)}
+</style>
+</head>
+<body>
+<nav>
+<div class="logo">◆ VOIDMAP Explorer</div>
+<a href="/voidmap/">← Back to Voidmap</a>
+</nav>
+<div class="container">
+<div class="stats">
+<div class="stat-card"><div class="l">Blocks</div><div class="v" id="blocks">1,247,893</div><div class="c up">▲ 2.3%</div></div>
+<div class="stat-card"><div class="l">Active Miners</div><div class="v">3,421</div><div class="c up">▲ 12 today</div></div>
+<div class="stat-card"><div class="l">Data Sales (24h)</div><div class="v" id="sales-usd">$47.2K</div><div class="c up">▲ 8.1%</div></div>
+<div class="stat-card"><div class="l">VOID Staked</div><div class="v">342M</div><div class="c down">▼ 0.3%</div></div>
+<div class="stat-card"><div class="l">GPU Hashrate</div><div class="v">2.4 PH/s</div><div class="c up">▲ 1.2%</div></div>
+<div class="stat-card"><div class="l">Tasks Active</div><div class="v">3</div><div class="c">Exoplanet · Galaxy · Anomaly</div></div>
+</div>
+
+<h3>Blocks</h3>
+<table><thead><tr><th>Block</th><th>Age</th><th>Miner</th><th>Task</th><th>Data Quality</th><th>Reward</th></tr></thead><tbody id="blocks-tb"></tbody></table>
+
+<div style="display:flex;gap:2rem;flex-wrap:wrap">
+<div style="flex:1;min-width:300px">
+<h3 style="margin-top:2rem">Data Sales</h3>
+<table><thead><tr><th>ID</th><th>Task</th><th>Quality</th><th>Price</th><th>Status</th></tr></thead><tbody id="sales-tb"></tbody></table>
+</div>
+<div style="flex:1;min-width:300px">
+<h3 style="margin-top:2rem">Top Miners</h3>
+<table><thead><tr><th>Miner</th><th>Score</th><th>Submitted</th></tr></thead><tbody id="miners-tb"></tbody></table>
+</div>
+</div>
+
+<div class="pag"><button>←</button><button>1</button><button>2</button><button>3</button><button>→</button></div>
+</div>
+
+<script>
+const miners=['0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18','0x8B2f96Bf5B5c5f5eB5c5b5D5A5e5F5c5B5a5b5C5','0xDeaDbeefdEAdbeefdEadbeefDeAdbEefDeAdbEef','0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b','0x9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b','0xba5e35Cc6634C0532925a3b844Bc9e7595f2b99','0xBeEfBabeF00dCafeBabeF00dCafeBabeF00dCafe','0xccCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCc'];
+const tasks=['Exoplanet','Galaxy','Anomaly'];
+const statuses=['Verified','Verified','Verified','Pending','Verified','Verified','Disputed','Verified'];
+const r=(m,x)=>Math.floor(Math.random()*(x-m+1))+m;
+function blk(){const t=document.getElementById('blocks-tb');t.innerHTML='';for(let i=0;i<12;i++){const b=1247893-i;const q=r(55,99);t.innerHTML+=`<tr><td class="hash">#${b}</td><td>${i+1}s</td><td class="addr">${miners[i%miners.length].slice(0,8)}..</td><td><span class="badge b-b">${tasks[i%3]}</span></td><td>${q}/100</td><td>${(q*1.5+r(0,20)).toFixed(1)} VOID</td></tr>`}}
+function sal(){const t=document.getElementById('sales-tb');t.innerHTML='';for(let i=0;i<10;i++){const id=r(1e4,99999),q=r(60,99),c=statuses[i%statuses.length];t.innerHTML+=`<tr><td class="hash">#${id}</td><td><span class="badge b-b">${tasks[i%3]}</span></td><td>${q}/100</td><td>${(Math.random()*200+5).toFixed(1)} VOID</td><td><span class="badge ${c==='Verified'?'b-g':c==='Pending'?'b-b':'b-r'}">${c}</span></td></tr>`}}
+function top(){const t=document.getElementById('miners-tb');t.innerHTML='';for(let i=0;i<8;i++){const s=r(50,999);t.innerHTML+=`<tr><td class="addr">${miners[i].slice(0,10)}..</td><td>${s}</td><td>${r(10,500)}</td></tr>`}}
+blk();sal();top();
+</script>
+</body>
+</html>

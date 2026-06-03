@@ -1,0 +1,19 @@
+name: Test Contracts
+
+on:
+  push:
+    branches: [main]
+    paths: ['contracts/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: |
+          cd contracts
+          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+          forge build --sizes
