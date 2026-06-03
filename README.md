@@ -1,88 +1,53 @@
 # Voidmap
 
-**GPUs analyze space imagery → Earn VOID → Sell data → Value flows back to miners**
-
-A hybrid Proof of Useful Work (PoUW) token. Miners run GPU-powered computer vision on public astronomical datasets (Hubble, JWST, TESS). The results — exoplanet transits, galaxy classifications, anomaly detections — are verified by the network and sold on the built-in data marketplace.
-
-**Works on:** NVIDIA (CUDA), AMD (ROCm/OpenCL), Apple Silicon (MPS), Intel (OpenCL), CPU
+**Proof of Useful Work.** GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Earn VOID for running scientific computation.
 
 ## Quick Start
 
 ```bash
-# Install the miner
 cd miner
-pip install -r requirements.txt
-
-# Run it (auto-detects best GPU backend)
-python voidmap-miner.py --address 0xYourWallet --rounds 10
-
-# Or detect your hardware
+pip install torch numpy astropy
 python voidmap-miner.py --detect
+python voidmap-miner.py --rounds 100
 ```
 
-## How It Works
+## Mining Tasks
 
-```
-GPU Miner runs astronomical analysis
-        │
-        ▼
-  Submits proof of work (quality score 0-100)
-        │
-        ▼
-  Network verifies (spot-check + cross-validation)
-        │
-        ▼
-  Earns VOID tokens proportional to data quality
-        │
-        ▼
-  Data listed on marketplace for researchers
-        │
-        ▼
-  Fees buy back & burn → sustainable value loop
-```
-
-## GPU Mining Tasks (DAO-rotated)
-
-| Task | Dataset | Model | GPU Load |
-|------|---------|-------|----------|
-| Exoplanet Transit Detection | TESS light curves | 1D CNN | Light |
-| Galaxy Morphology | JWST/Hubble images | EfficientNet | Heavy |
-| Anomaly Detection | ZTF alert stream | Autoencoder | Medium |
-
-## Smart Contracts
-
-| Contract | Address | Description |
-|----------|---------|-------------|
-| VoidmapToken | *deployed* | ERC-20 with vesting & renounce |
-| DataMarketplace | *deployed* | Buy/sell verified astronomical data |
-| MiningPool | *deployed* | GPU work submission & rewards |
+| Task | What it does | Data source |
+|------|-------------|-------------|
+| Exoplanet Transit | Detect transits in TESS light curves (1D CNN) | MAST Archive |
+| Galaxy Morphology | Classify SDSS/HST galaxies (EfficientNet) | SDSS DR18 |
+| Anomaly Detection | Flag unusual transients (Autoencoder) | ZTF / IPAC |
 
 ## Tokenomics
 
-| Supply | 1,000,000,000 VOID |
-|--------|-------------------|
-| GPU Miners | ~40% over 10 years |
-| Dev Fund | 12% (4-year vesting, 6-month cliff) |
-| Treasury | 15% (DAO-controlled grants) |
-| Public/LP/Airdrop | 23% |
-| Partners | 10% |
+| Metric | Value |
+|--------|-------|
+| VOID Supply | 1,000,000,000 |
+| GPU Miners | 90% (900M) |
+| Dev Fund | 5% (50M) — 4yr vesting |
+| Treasury | 5% (50M) — community DAO |
 
-## Architecture
+## Real data, real computation
+
+- Miners download real astronomical data from public archives
+- Process it with actual ML models (not simulations)
+- Quality scored by model confidence / reconstruction error
+- Results are verifiable and scientifically useful
+
+## Contracts
 
 ```
-web/              → GitHub Pages (landing page)
-explorer/         → GitHub Pages or Vercel (block explorer)
-contracts/        → Solidity (Ethereum L2)
-miner/            → Python GPU miner (any GPU)
+VoidmapToken.sol → ERC-20, 90% miner allocation, renounceable
+MiningPool.sol   → Accepts work submissions, mints rewards
 ```
 
-## Deploy Contracts
+## Deployment
 
 ```bash
-cd contracts
-forge install OpenZeppelin/openzeppelin-contracts --no-commit
-forge build
-forge script script/Deploy.s.sol --rpc-url <rpc> --broadcast
+export DEPLOYER_PK=0x...
+export DEV_ADDR=0x...
+bash deploy.sh
 ```
 
 ## License

@@ -1,72 +1,62 @@
 # Voidmap Whitepaper
 
-## Proof of Useful Work: Mining the Universe
+## Proof of Useful Work
 
-### Abstract
+GPU miners process real astronomical data. Earn VOID tokens. Contribute to science.
 
-Voidmap introduces a hybrid Proof of Useful Work (PoUW) token where GPU mining
-is directed toward astronomical analysis. Unlike PoW (energy waste) or PoS
-(wealth concentration), Voidmap creates value from the mining process itself.
+### The Problem
 
-### How It Works
+- PoW mining wastes energy on hashing with zero useful output
+- Public astronomical archives (NASA TESS, SDSS, ZTF) hold petabytes of unprocessed data
+- Researchers lack GPU compute to process it all
 
-1. GPU miners download astronomical analysis tasks (voted by token holders)
-2. GPUs process real scientific data (TESS, JWST, Hubble, ZTF)
-3. Results are submitted with a proof of computation
-4. Network verifies via spot-checking and cross-validation
-5. Valid results earn VOID tokens proportional to data quality
-6. Data is listed on the marketplace for researchers
-7. Marketplace fees buy back & burn → sustainable value loop
+### The Solution
 
-### GPU Backend Support
-
-| Backend | GPUs | Platform |
-|---------|------|----------|
-| CUDA | NVIDIA | Linux, Windows |
-| ROCm | AMD RX/Pro/Instinct | Linux |
-| MPS | Apple Silicon | macOS |
-| OpenCL | AMD, Intel, NVIDIA | Linux, Windows, macOS |
-| CPU Fallback | Any | Any |
+Voidmap directs GPU mining power toward actual scientific computation:
+- Download real data from public archives
+- Run real ML models (CNNs, EfficientNets, Autoencoders)
+- Quality scores reflect real model performance
+- Results are verifiable and reproducible
 
 ### Tokenomics
 
-| Metric | Value |
-|--------|-------|
-| Ticker | VOID |
-| Max Supply | 1,000,000,000 |
-| Dev Fund | 12% (4-yr vesting, 6-mo cliff) |
-| Dev Fund Control | 3-of-5 multisig |
+| Allocation | % | Amount |
+|------------|---|--------|
+| GPU Miners | 90% | 900M VOID |
+| Developer Fund | 5% | 50M VOID |
+| Treasury | 5% | 50M VOID |
 
-### Allocation
+Dev fund vests over 4 years with all wallet addresses published at genesis.
 
-- **40%** GPU Mining Rewards (10-year emission schedule)
-- **15%** Ecosystem DAO (community grants)
-- **12%** Developer Fund (vested transparently)
-- **10%** Public Sale
-- **10%** Strategic Partners
-- **8%** Liquidity Pool
-- **5%** Community Airdrop
+### Mining Tasks
 
-### Founder Transparency
+1. **Exoplanet Transit Detection**
+   - Model: 1D CNN (TransitCNN)
+   - Data: TESS 2-minute cadence light curves (MAST)
+   - Output: Transit confidence scores
 
-The dev fund uses a 3-of-5 multisig wallet with published addresses. All
-transactions are publicly visible on-chain. After the 4-year vesting period,
-continued funding requires DAO approval.
+2. **Galaxy Morphology Classification**
+   - Model: EfficientNet-V2
+   - Data: SDSS DR18 and HST imagery
+   - Output: Galaxy class + confidence (Spiral, Elliptical, Irregular, Merger)
+
+3. **Astronomical Anomaly Detection**
+   - Model: Autoencoder (AnomalyAE)
+   - Data: ZTF alert stream
+   - Output: Anomaly scores based on reconstruction error
 
 ### Smart Contracts
 
-- **VoidmapToken.sol** — ERC-20 with vesting; ownership renounceable
-- **DataMarketplace.sol** — P2P data exchange with escrow & arbitration
-- **MiningPool.sol** — GPU work verification & reward distribution
+- **VoidmapToken** — ERC-20 with 90% miner allocation, transparent dev fund
+- **MiningPool** — Accepts GPU work submissions, distributes rewards
 
-### Fee Structure
+### Governance
 
-| Action | Fee | Destination |
-|--------|-----|-------------|
-| Data Purchase | 1% | Treasury (buyback & burn) |
+Future DAO will control:
+- Task selection (what gets computed)
+- Reward multipliers per task
+- Treasury grants for ecosystem development
 
-### No Roadmap. No Promises.
+### No Promises. Just Code.
 
-Voidmap exists as code, not promises. There is no company, no CEO, no
-locked-in roadmap. The community runs the nodes, votes on tasks, and
-decides the future through the DAO.
+Voidmap has no company, no CEO, no roadmap. It exists as open-source code on GitHub. The contracts are deployable by anyone. The value is in the computation.

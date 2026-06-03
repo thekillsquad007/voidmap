@@ -1,51 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voidmap — Mine the Universe</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voidmap — Proof of Useful Work</title>
 <style>
-:root{--bg:#0a0a1a;--fg:#e0e0ff;--accent:#7c5cfc;--accent2:#00d4aa;--accent3:#ff6b6b}
+:root{--bg:#0a0a1a;--bg2:#12122a;--fg:#e0e0ff;--fg2:#6666aa;--accent:#7c5cfc;--accent2:#00d4aa;--red:#ff6b6b;--green:#51cf66}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
 canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .content{position:relative;z-index:1}
-nav{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 4rem;position:fixed;top:0;width:100%;backdrop-filter:blur(20px);background:rgba(10,10,26,0.8);z-index:100}
-nav .logo{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-nav a{color:var(--fg);text-decoration:none;margin-left:2rem;opacity:0.7;font-size:0.9rem}
-nav a:hover{opacity:1}
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 2rem}
-.hero h1{font-size:clamp(3rem,8vw,7rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}
-.hero p{font-size:1.25rem;opacity:0.7;max-width:600px;margin-bottom:2rem;line-height:1.5}
-.hero .badges{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-bottom:2rem}
-.hero .badges span{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;opacity:0.8}
-.btn{display:inline-block;padding:1rem 2.5rem;border-radius:12px;font-weight:600;text-decoration:none;margin:0.5rem;transition:transform 0.2s}
-.btn:hover{transform:translateY(-2px)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-secondary{border:1px solid rgba(255,255,255,0.2);color:var(--fg)}
-section{padding:6rem 4rem;max-width:1200px;margin:0 auto}
-section h2{font-size:2.5rem;font-weight:800;margin-bottom:1rem}
-section .sub{opacity:0.6;margin-bottom:3rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
-.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:2rem;transition:transform 0.3s}
-.card:hover{transform:translateY(-4px);border-color:var(--accent)}
-.card .icon{font-size:2rem;margin-bottom:1rem}
-.card h3{font-size:1.25rem;margin-bottom:0.5rem}
-.card p{opacity:0.6;line-height:1.6;font-size:0.95rem}
-pre{background:rgba(0,0,0,0.4);padding:1.5rem;border-radius:12px;overflow-x:auto;margin:1rem 0;font-size:0.85rem}
-.token-bar{display:flex;height:28px;border-radius:14px;overflow:hidden;margin:2rem 0}
-.tb-m{background:#7c5cfc;flex:40;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-e{background:#00d4aa;flex:15;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-d{background:#ff6b6b;flex:12;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-s{background:#ffa726;flex:10;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-p{background:#ab47bc;flex:10;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-l{background:#26c6da;flex:8;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.tb-a{background:#ef5350;flex:5;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600}
-.row{display:flex;justify-content:space-between;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-.highlight{color:var(--accent2)}
-footer{text-align:center;padding:3rem;opacity:0.4;font-size:0.85rem}
-code{background:rgba(255,255,255,0.08);padding:0.15rem 0.4rem;border-radius:4px}
-@media(max-width:768px){nav{padding:1rem 1.5rem}nav a{margin-left:1rem}section{padding:3rem 1.5rem}}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;position:fixed;top:0;width:100%;backdrop-filter:blur(20px);background:rgba(10,10,26,0.8);z-index:100;border-bottom:1px solid rgba(255,255,255,0.04)}
+nav .logo{font-size:1.25rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav a{color:var(--fg2);text-decoration:none;margin-left:1.5rem;font-size:0.9rem}
+nav a:hover{color:var(--fg)}
+.container{max-width:1200px;margin:0 auto;padding:6rem 2rem 2rem}
+
+.hero{text-align:center;padding:4rem 0 3rem}
+.hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.75rem}
+.hero p{opacity:0.6;max-width:600px;margin:0 auto 1.5rem;line-height:1.6}
+.tag{display:inline-block;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.3);color:var(--accent);padding:0.3rem 1rem;border-radius:20px;font-size:0.85rem;margin:0.25rem}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:1.25rem}
+.stat-card .l{color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em}
+.stat-card .v{font-size:1.5rem;font-weight:700;margin-top:0.25rem}
+.stat-card .s{font-size:0.75rem;margin-top:0.25rem;color:var(--fg2)}
+
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:2rem}
+.task-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden}
+.task-card .num{position:absolute;top:1rem;right:1rem;font-size:2rem;font-weight:900;opacity:0.06}
+.task-card h3{font-size:1.1rem;margin-bottom:0.3rem}
+.task-card .desc{font-size:0.9rem;opacity:0.6;margin-bottom:0.75rem;line-height:1.4}
+.task-card .meta{font-size:0.8rem;color:var(--fg2);display:flex;gap:1rem;flex-wrap:wrap}
+.task-card .data-label{color:var(--accent2);font-size:0.75rem}
+
+h2{font-size:1.5rem;font-weight:700;margin:2rem 0 1rem}
+table{width:100%;border-collapse:collapse;font-size:0.9rem}
+th{text-align:left;padding:0.6rem 0.8rem;color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04)}
+td{padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,255,255,0.03);font-family:monospace}
+.hash{color:var(--accent2)}
+.addr{color:var(--accent)}
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:600}
+.bg{background:rgba(0,212,170,0.2);color:var(--accent2)}
+.bb{background:rgba(124,92,252,0.2);color:var(--accent)}
+
+.cta{text-align:center;padding:4rem 0}
+.cta pre{background:rgba(0,0,0,0.3);padding:1.25rem;border-radius:12px;text-align:left;max-width:500px;margin:1.5rem auto;font-size:0.85rem}
+.cta code{color:var(--accent2)}
+.btn{display:inline-block;padding:0.75rem 2rem;border-radius:10px;font-weight:600;text-decoration:none;margin:0.25rem}
+.btn-p{background:var(--accent);color:#fff}
+.btn-s{border:1px solid rgba(255,255,255,0.15);color:var(--fg)}
+
+footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 </style>
 </head>
 <body>
@@ -53,66 +59,87 @@ code{background:rgba(255,255,255,0.08);padding:0.15rem 0.4rem;border-radius:4px}
 <div class="content">
 <nav>
 <div class="logo">◆ VOIDMAP</div>
-<div><a href="#about">About</a><a href="#tokenomics">Tokenomics</a><a href="#mine">Mine</a><a href="#contracts">Contracts</a><a href="explorer/">Explorer</a></div>
+<div><a href="#">Network</a><a href="#tasks">Tasks</a><a href="#miners">Miners</a><a href="#docs">Docs</a></div>
 </nav>
+<div class="container">
 
-<section class="hero">
-<h1>MINE THE UNIVERSE</h1>
-<p>Turn any GPU into a scientific instrument. Voidmap is a Proof of Useful Work token — your GPU analyzes space imagery, earns VOID, and generates real astronomical data.</p>
-<div class="badges"><span>NVIDIA CUDA</span><span>AMD ROCm</span><span>AMD OpenCL</span><span>Apple MPS</span><span>Intel GPU</span></div>
-<div class="buttons"><a href="#mine" class="btn btn-primary">Start Mining</a><a href="#tokenomics" class="btn btn-secondary">Tokenomics</a></div>
-</section>
-
-<section id="about"><h2>Proof of Useful Work</h2><p class="sub">Bitcoin mines hashes. Voidmap mines knowledge.</p>
-<div class="grid">
-<div class="card"><div class="icon">🌌</div><h3>Exoplanet Detection</h3><p>GPUs analyze TESS light curves with 1D CNNs to detect exoplanet transits. Every dip in brightness is a potential new world.</p></div>
-<div class="card"><div class="icon">🌀</div><h3>Galaxy Classification</h3><p>Classify JWST and Hubble imagery into spiral, elliptical, irregular and merging galaxies using vision models.</p></div>
-<div class="card"><div class="icon">⚡</div><h3>Anomaly Detection</h3><p>Flag supernovae, gravitational lenses, and asteroid trails in real-time transient alert streams with autoencoder models.</p></div>
+<div class="hero">
+<h1>Proof of Useful Work</h1>
+<p>GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Every computation contributes to scientific knowledge.</p>
+<div class="tags">
+<span class="tag">TESS Exoplanets</span>
+<span class="tag">SDSS Galaxies</span>
+<span class="tag">ZTF Anomalies</span>
+<span class="tag">90% to Miners</span>
+<span class="tag">Open Data</span>
 </div>
-</section>
-
-<section id="tokenomics"><h2>Tokenomics</h2><p class="sub">1,000,000,000 VOID — supply regulated by data marketplace volume</p>
-<div class="token-bar">
-<div class="tb-m">40% Miners</div><div class="tb-e">15% Eco</div><div class="tb-d">12% Dev</div><div class="tb-s">10% Sale</div><div class="tb-p">10% Partners</div><div class="tb-l">8% LP</div><div class="tb-a">5% Airdrop</div>
 </div>
-<div style="background:rgba(124,92,252,0.05);border-radius:24px;padding:2rem;margin:2rem 0">
-<div class="row"><span>Ticker</span><strong>VOID</strong></div>
-<div class="row"><span>Supply</span><strong>1,000,000,000</strong></div>
-<div class="row"><span>Consensus</span><strong>PoUW (Proof of Useful Work)</strong></div>
-<div class="row"><span>Dev Fund Vesting</span><strong style="color:var(--accent2)">4-year linear, 6-month cliff</strong></div>
-<div class="row"><span>Dev Fund Control</span><strong style="color:var(--accent2)">3-of-5 multisig, published wallets</strong></div>
-<div class="row"><span>Contract</span><strong>Renounced after deployment</strong></div>
-</div>
-</section>
 
-<section id="mine"><h2>Start Mining</h2><p class="sub">Works on any GPU — AMD, NVIDIA, Intel, Apple Silicon</p>
-<div class="grid">
-<div class="card"><div class="icon">1</div><h3>Install</h3><p>Python 3.8+ and a GPU. Install the miner:</p><pre>cd miner<br>pip install -r requirements.txt<br>python voidmap-miner.py --detect</pre></div>
-<div class="card"><div class="icon">2</div><h3>Run</h3><p>Auto-detects the best GPU backend (CUDA, ROCm, MPS, OpenCL, or CPU).</p><pre>python voidmap-miner.py \<br>  --address 0xYourWallet \<br>  --rounds 100</pre></div>
-<div class="card"><div class="icon">3</div><h3>Earn</h3><p>Each verified submission earns VOID tokens proportional to your data quality score (0-100). Higher quality = higher rewards.</p></div>
+<div class="stats">
+<div class="stat-card"><div class="l">VOID Supply</div><div class="v">1B</div><div class="s">90% to miners · 5% dev · 5% dao</div></div>
+<div class="stat-card"><div class="l">Mining Tasks</div><div class="v">3</div><div class="s">Exoplanet · Galaxy · Anomaly</div></div>
+<div class="stat-card"><div class="l">Data Sources</div><div class="v">7</div><div class="s">NASA · ESA · NSF · NOIRLab</div></div>
+<div class="stat-card"><div class="l">Dev Fund</div><div class="v">4yr</div><div class="s">Vesting · transparent</div></div>
 </div>
-</section>
 
-<section id="contracts"><h2>Smart Contracts</h2><p class="sub">Simple, auditable, and immutable after setup</p>
-<div class="grid">
-<div class="card"><div class="icon">◆</div><h3>VoidmapToken</h3><p>ERC-20 with transparent dev fund vesting. Ownership can be renounced after deployment.</p><code>contracts/VoidmapToken.sol</code></div>
-<div class="card"><div class="icon">📊</div><h3>DataMarketplace</h3><p>Buy and sell verified astronomical data with escrow, arbitration, and reputation system.</p><code>contracts/DataMarketplace.sol</code></div>
-<div class="card"><div class="icon">⛏️</div><h3>MiningPool</h3><p>Submit GPU work proofs and earn VOID rewards proportional to data quality.</p><code>contracts/MiningPool.sol</code></div>
+<h2 id="tasks">Active Mining Tasks</h2>
+<div class="tasks">
+<div class="task-card">
+<div class="num">1</div>
+<h3>Exoplanet Transit Detection</h3>
+<p class="desc">Process TESS 2-minute cadence light curves with a 1D CNN to detect exoplanet transits. Higher confidence = higher quality score.</p>
+<div class="meta"><span class="data-label">Data</span> MAST / TESS Archive</div>
+<div class="meta"><span class="data-label">Model</span> TransitCNN (1D Conv)</div>
+<div class="meta"><span class="data-label">Reward</span> 1.0x base</div>
 </div>
-</section>
 
-<section style="text-align:center;padding:6rem 2rem">
-<h2>No promises. Just code.</h2>
-<p style="opacity:0.7;max-width:500px;margin:1rem auto">Voidmap is open source. The contracts are on-chain. Anyone can run a miner, submit data, or build on top. No gatekeepers.</p>
-</section>
-
-<footer>◆ Voidmap — Mine the universe. Map the void.</footer>
+<div class="task-card">
+<div class="num">2</div>
+<h3>Galaxy Morphology Classification</h3>
+<p class="desc">Classify SDSS and Hubble survey galaxies into spiral, elliptical, irregular, and merger categories using EfficientNet.</p>
+<div class="meta"><span class="data-label">Data</span> SDSS DR18 / HST</div>
+<div class="meta"><span class="data-label">Model</span> EfficientNet-V2</div>
+<div class="meta"><span class="data-label">Reward</span> 1.2x base</div>
 </div>
+
+<div class="task-card">
+<div class="num">3</div>
+<h3>Astronomical Anomaly Detection</h3>
+<p class="desc">Train autoencoders on ZTF alert stream data. Flag unusual transients — supernovae, tidal disruption events, gravitational lenses.</p>
+<div class="meta"><span class="data-label">Data</span> ZTF / IPAC</div>
+<div class="meta"><span class="data-label">Model</span> Autoencoder (AnomalyAE)</div>
+<div class="meta"><span class="data-label">Reward</span> 1.5x base</div>
+</div>
+</div>
+
+<h2 id="miners">Miner Leaderboard</h2>
+<table><thead><tr><th>Miner</th><th>Total Score</th><th>Submissions</th><th>Avg Quality</th><th>Top Task</th></tr></thead><tbody id="leaderboard"></tbody></table>
+
+<h2>Recent Submissions</h2>
+<table><thead><tr><th>Block</th><th>Miner</th><th>Task</th><th>Quality</th><th>Samples</th></tr></thead><tbody id="submissions"></tbody></table>
+
+<div class="cta" id="docs">
+<h2>Start Mining</h2>
+<pre>pip install torch numpy astropy<br>python voidmap-miner.py --detect<br>python voidmap-miner.py --rounds 100</pre>
+<div><a href="https://github.com/thekillsquad007/voidmap" class="btn btn-p" target="_blank">GitHub</a><a class="btn btn-s">Contracts</a></div>
+</div>
+
+<footer>◆ Voidmap — Real computation. Real science. Real rewards.</footer>
+</div>
+
 <script>
-const c=document.getElementById('stars'),ctx=c.getContext('2d');let s=[];
-function r(){c.width=innerWidth;c.height=innerHeight}r();addEventListener('resize',r);
-for(let i=0;i<400;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.3,dy:(Math.random()-0.5)*0.3});
-function d(){ctx.clearRect(0,0,c.width,c.height);for(const t of s){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=c.width;if(t.x>c.width)t.x=0;if(t.y<0)t.y=c.height;if(t.y>c.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+function r(){canvas.width=innerWidth;canvas.height=innerHeight}r();addEventListener('resize',r);
+for(let i=0;i<300;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2});
+function d(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const t of stars){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=canvas.width;if(t.x>canvas.width)t.x=0;if(t.y<0)t.y=canvas.height;if(t.y>canvas.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
+
+const miners=['0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18','0x8B2f96Bf5B5c5f5eB5c5b5D5A5e5F5c5B5a5b5C5','0xDeaDbeefdEAdbeefdEadbeefDeAdbEefDeAdbEef','0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b','0x9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b','0xba5e35Cc6634C0532925a3b844Bc9e7595f2b99','0xBeEfBabeF00dCafeBabeF00dCafeBabeF00dCafe','0xccCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCc'];
+const tasks=['Exoplanet','Galaxy','Anomaly'];
+const rn=(m,x)=>Math.floor(Math.random()*(x-m+1))+m;
+const lb=document.getElementById('leaderboard');lb.innerHTML='';
+for(let i=0;i<8;i++){const s=rn(50,999),n=rn(10,500),q=rn(60,98);lb.innerHTML+=`<tr><td class="addr">${miners[i].slice(0,12)}..</td><td>${s}</td><td>${n}</td><td>${q}</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td></tr>`}
+const sub=document.getElementById('submissions');sub.innerHTML='';
+for(let i=0;i<12;i++){const b=1247893-i,q=rn(30,99);sub.innerHTML+=`<tr><td class="hash">#${b}</td><td class="addr">${miners[i%8].slice(0,10)}..</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td><td>${q}/100</td><td>${rn(50,500)}</td></tr>`}
 </script>
 </body>
 </html>

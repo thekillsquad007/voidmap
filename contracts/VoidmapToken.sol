@@ -2,37 +2,52 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract VoidmapToken is ERC20, ERC20Burnable, Ownable {
-    uint256 public constant SUPPLY = 1_000_000_000 * 10**18;
+contract VoidmapToken is ERC20, Ownable {
+    uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18;
+    uint256 public constant MINER_SHARE = 900_000_000 * 10**18; // 90%
+    uint256 public constant DEV_SHARE   =  50_000_000 * 10**18; // 5%
+    uint256 public constant DAO_SHARE   =  50_000_000 * 10**18; // 5%
 
-    bool public immutable locked;
-    uint256 public immutable devFundVestingEnd;
-    mapping(address => uint256) public lastClaim;
+    uint256 public immutable vestingEnd;
+    address public immutable devFund;
+    address public immutable daoFund;
+    uint256 public totalMinerMinted;
 
-    event DevTokensClaimed(address indexed recipient, uint256 amount);
+    bool public renounced;
 
-    constructor(address devFund, address daoFund) ERC20("Voidmap", "VOID") Ownable(msg.sender) {
-        _mint(devFund, 120_000_000 * 10**18);    // 12% dev fund — vested
-        _mint(daoFund, 150_000_000 * 10**18);     // 15% DAO treasury
-        _mint(address(this), 100_000_000 * 10**18); // 10% vesting pool
-        // Remaining 63% allocated elsewhere (sale, LP, airdrop, miners, partners)
+    event MinerReward(address indexed miner, uint256 amount, uint256 taskId, uint256 quality);
+    event DevClaimed(uint256 amount);
 
-        devFundVestingEnd = block.timestamp + 4 * 365 days;
-        locked = true;
+    constructor(address _dev, address _dao) ERC20("Voidmap", "VOID") Ownable(msg.sender) {
+        devFund = _dev;
+        daoFund = _dao;
+        vestingEnd = block.timestamp + 1461 days; // 4 years
+        _mint(devFund, DEV_SHARE);
+        _mint(daoFund, DAO_SHARE);
     }
 
-    function claimDevTokens(address recipient, uint256 amount) external onlyOwner {
-        require(locked, "Already unlocked");
-        require(block.timestamp >= devFundVestingEnd, "Vesting not ended");
-        require(amount > 0 && balanceOf(address(this)) >= amount, "Insufficient pool");
-        _transfer(address(this), recipient, amount);
-        emit DevTokensClaimed(recipient, amount);
+    function mintMinerReward(address miner, uint256 amount, uint256 taskId, uint256 quality) external onlyOwner {
+        require(!renounced, "Renounced");
+        require(totalMinerMinted + amount <= MINER_SHARE, "Miner cap");
+        totalMinerMinted += amount;
+        _mint(miner, amount);
+        emit MinerReward(miner, amount, taskId, quality);
+    }
+
+    function devClaim() external {
+        require(msg.sender == devFund, "Only dev");
+        require(block.timestamp >= vestingEnd, "Vesting");
+        uint256 bal = balanceOf(devFund);
+        if (bal > 0) {
+            _transfer(devFund, msg.sender, bal);
+            emit DevClaimed(bal);
+        }
     }
 
     function renounce() external onlyOwner {
+        renounced = true;
         renounceOwnership();
     }
 }
