@@ -3,7 +3,9 @@ name: Test Contracts
 on:
   push:
     branches: [main]
-    paths: ['contracts/**']
+    paths:
+      - 'contracts/**'
+      - '.github/workflows/test-contracts.yml'
   pull_request:
     branches: [main]
 
