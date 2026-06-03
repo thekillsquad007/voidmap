@@ -1,0 +1,20 @@
+{
+  "title": "Voidmap Documentation",
+  "description": "Proof of Useful Work — GPU miners process real astronomical data",
+  "root": "./",
+  "structure": {
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
+  },
+  "plugins": [
+    "search",
+    "theme-default",
+    "code",
+    "expandable-chapters"
+  ],
+  "pluginsConfig": {
+    "theme-default": {
+      "showLevel": true
+    }
+  }
+}
