@@ -112,15 +112,51 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 </div>
 </div>
 
+<h2 id="quality">Data Quality & Thresholds</h2>
+<div class="stats">
+<div class="stat-card" style="border-color:var(--red)"><div class="l">Rejected</div><div class="v" style="color:var(--red)">&lt; 50</div><div class="s">Noise — work not accepted</div></div>
+<div class="stat-card" style="border-color:var(--fg2)"><div class="l">Accepted</div><div class="v">50-69</div><div class="s">Base reward — 1x multiplier</div></div>
+<div class="stat-card" style="border-color:var(--accent)"><div class="l">Good Work</div><div class="v" style="color:var(--accent)">70-89</div><div class="s">1.2x bonus reward</div></div>
+<div class="stat-card" style="border-color:var(--accent2)"><div class="l">Excellent</div><div class="v" style="color:var(--accent2)">90-100</div><div class="s">1.5x bonus reward</div></div>
+</div>
+
+<h2 id="pipeline">Data Pipeline</h2>
+<div class="tasks">
+<div class="task-card">
+<h3>1. Download Real Data</h3>
+<p class="desc">Miners download real astronomical data from public archives (MAST, SDSS, ZTF). No simulations — actual telescope observations.</p>
+<div class="meta"><span class="data-label">Sources</span> TESS, SDSS DR18, ZTF</div>
+</div>
+<div class="task-card">
+<h3>2. Process on GPU</h3>
+<p class="desc">Run real ML models on your GPU. TransitCNN for exoplanets, EfficientNet for galaxies, Autoencoder for anomalies.</p>
+<div class="meta"><span class="data-label">Output</span> Predictions + quality scores</div>
+</div>
+<div class="task-card">
+<h3>3. Store Results on IPFS</h3>
+<p class="desc">Results uploaded to IPFS (free via Pinata/NFT.Storage). CID stored on-chain. Anyone can access via IPFS gateway.</p>
+<div class="meta"><span class="data-label">Access</span> Public — open science</div>
+</div>
+<div class="task-card">
+<h3>4. Verify Your Work</h3>
+<p class="desc">Miner saves all results locally (~/.voidmap/results/). View exactly what you computed: transit detections, galaxy classes, anomalies.</p>
+<div class="meta"><span class="data-label">Command</span> --list-results</div>
+</div>
+</div>
+
 <h2 id="miners">Miner Leaderboard</h2>
 <table><thead><tr><th>Miner</th><th>Total Score</th><th>Submissions</th><th>Avg Quality</th><th>Top Task</th></tr></thead><tbody id="leaderboard"></tbody></table>
 
 <h2>Recent Submissions</h2>
-<table><thead><tr><th>Block</th><th>Miner</th><th>Task</th><th>Quality</th><th>Samples</th></tr></thead><tbody id="submissions"></tbody></table>
+<table><thead><tr><th>Block</th><th>Miner</th><th>Task</th><th>Quality</th><th>Samples</th><th>IPFS</th></tr></thead><tbody id="submissions"></tbody></table>
 
 <div class="cta" id="docs">
 <h2>Start Mining</h2>
-<pre>pip install torch numpy astropy<br>python voidmap-miner.py --detect<br>python voidmap-miner.py --rounds 100</pre>
+<pre>pip install torch numpy astropy
+python voidmap-miner.py --detect
+python voidmap-miner.py --rounds 100
+python voidmap-miner.py --list-results</pre>
+<p style="margin:1rem 0;font-size:0.9rem;opacity:0.7">Results saved to ~/.voidmap/results/ — view exactly what you computed</p>
 <div><a href="https://github.com/thekillsquad007/voidmap" class="btn btn-p" target="_blank">GitHub</a><a class="btn btn-s">Contracts</a></div>
 </div>
 
@@ -139,7 +175,7 @@ const rn=(m,x)=>Math.floor(Math.random()*(x-m+1))+m;
 const lb=document.getElementById('leaderboard');lb.innerHTML='';
 for(let i=0;i<8;i++){const s=rn(50,999),n=rn(10,500),q=rn(60,98);lb.innerHTML+=`<tr><td class="addr">${miners[i].slice(0,12)}..</td><td>${s}</td><td>${n}</td><td>${q}</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td></tr>`}
 const sub=document.getElementById('submissions');sub.innerHTML='';
-for(let i=0;i<12;i++){const b=1247893-i,q=rn(30,99);sub.innerHTML+=`<tr><td class="hash">#${b}</td><td class="addr">${miners[i%8].slice(0,10)}..</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td><td>${q}/100</td><td>${rn(50,500)}</td></tr>`}
+for(let i=0;i<12;i++){const b=1247893-i,q=rn(50,99),ipfs='Qm'+Array.from({length:10},()=>Math.floor(Math.random()*16).toString(16)).join('');sub.innerHTML+=`<tr><td class="hash">#${b}</td><td class="addr">${miners[i%8].slice(0,10)}..</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td><td>${q}/100</td><td>${rn(50,500)}</td><td class="hash" title="View on IPFS">${ipfs.slice(0,12)}..</td></tr>`}
 </script>
 </body>
 </html>
