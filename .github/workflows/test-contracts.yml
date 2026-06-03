@@ -19,4 +19,5 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@v1
       - run: |
           cd contracts
-          forge build --skip "lib/openzeppelin-contracts/fv" --sizes
+          rm -rf lib/openzeppelin-contracts/fv lib/openzeppelin-contracts/test lib/openzeppelin-contracts/scripts
+          forge build --sizes
