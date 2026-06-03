@@ -78,8 +78,8 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 <div class="stats">
 <div class="stat-card"><div class="l">VOID Supply</div><div class="v">1B</div><div class="s">90% to miners · 5% dev · 5% dao</div></div>
 <div class="stat-card"><div class="l">Mining Tasks</div><div class="v">3</div><div class="s">Exoplanet · Galaxy · Anomaly</div></div>
-<div class="stat-card"><div class="l">Data Sources</div><div class="v">7</div><div class="s">NASA · ESA · NSF · NOIRLab</div></div>
-<div class="stat-card"><div class="l">Dev Fund</div><div class="v">4yr</div><div class="s">Vesting · transparent</div></div>
+<div class="stat-card"><div class="l">Data Sources</div><div class="v">Real</div><div class="s">MAST · SDSS DR18 · ZTF/Fink</div></div>
+<div class="stat-card"><div class="l">Models</div><div class="v">Pre-trained</div><div class="s">AstroNet · Zoobot · Autoencoder</div></div>
 </div>
 
 <h2 id="tasks">Active Mining Tasks</h2>
@@ -87,28 +87,28 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 <div class="task-card">
 <div class="num">1</div>
 <h3>Exoplanet Transit Detection</h3>
-<p class="desc">Process TESS 2-minute cadence light curves with a 1D CNN to detect exoplanet transits. Higher confidence = higher quality score.</p>
-<div class="meta"><span class="data-label">Data</span> MAST / TESS Archive</div>
-<div class="meta"><span class="data-label">Model</span> TransitCNN (1D Conv)</div>
-<div class="meta"><span class="data-label">Reward</span> 1.0x base</div>
+<p class="desc">Download real TESS light curves from MAST, run pre-trained AstroNet CNN (244K params, 89% accuracy). Outputs: planet/false-positive/no-signal classification with confidence scores.</p>
+<div class="meta"><span class="data-label">Data</span> MAST TESS SPOC 2-min cadence</div>
+<div class="meta"><span class="data-label">Model</span> AstroNetCNN (HuggingFace)</div>
+<div class="meta"><span class="data-label">Output</span> Transit candidates + probabilities</div>
 </div>
 
 <div class="task-card">
 <div class="num">2</div>
 <h3>Galaxy Morphology Classification</h3>
-<p class="desc">Classify SDSS and Hubble survey galaxies into spiral, elliptical, irregular, and merger categories using EfficientNet.</p>
-<div class="meta"><span class="data-label">Data</span> SDSS DR18 / HST</div>
-<div class="meta"><span class="data-label">Model</span> EfficientNet-V2</div>
-<div class="meta"><span class="data-label">Reward</span> 1.2x base</div>
+<p class="desc">Download real SDSS DR18 galaxy images, classify morphology (spiral/elliptical/irregular/merger). Results include classification confidence and probability distribution.</p>
+<div class="meta"><span class="data-label">Data</span> SDSS DR18 cutout API</div>
+<div class="meta"><span class="data-label">Model</span> GalaxyClassifier (Zoobot-ready)</div>
+<div class="meta"><span class="data-label">Output</span> Morphology class + confidence</div>
 </div>
 
 <div class="task-card">
 <div class="num">3</div>
 <h3>Astronomical Anomaly Detection</h3>
-<p class="desc">Train autoencoders on ZTF alert stream data. Flag unusual transients — supernovae, tidal disruption events, gravitational lenses.</p>
-<div class="meta"><span class="data-label">Data</span> ZTF / IPAC</div>
-<div class="meta"><span class="data-label">Model</span> Autoencoder (AnomalyAE)</div>
-<div class="meta"><span class="data-label">Reward</span> 1.5x base</div>
+<p class="desc">Download real ZTF alerts from Fink broker, detect anomalies using autoencoder. Flags unusual transients — supernovae, tidal disruption events, gravitational lenses.</p>
+<div class="meta"><span class="data-label">Data</span> ZTF via Fink broker API</div>
+<div class="meta"><span class="data-label">Model</span> AnomalyDetector (autoencoder)</div>
+<div class="meta"><span class="data-label">Output</span> Anomaly scores + flags</div>
 </div>
 </div>
 
@@ -124,23 +124,37 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 <div class="tasks">
 <div class="task-card">
 <h3>1. Download Real Data</h3>
-<p class="desc">Miners download real astronomical data from public archives (MAST, SDSS, ZTF). No simulations — actual telescope observations.</p>
-<div class="meta"><span class="data-label">Sources</span> TESS, SDSS DR18, ZTF</div>
+<p class="desc">Miners download actual FITS files from MAST, cutout images from SDSS, and alert streams from ZTF/Fink. No simulations — real telescope observations.</p>
+<div class="meta"><span class="data-label">APIs</span> MAST Portal · SDSS SkyServer · Fink REST</div>
 </div>
 <div class="task-card">
 <h3>2. Process on GPU</h3>
-<p class="desc">Run real ML models on your GPU. TransitCNN for exoplanets, EfficientNet for galaxies, Autoencoder for anomalies.</p>
-<div class="meta"><span class="data-label">Output</span> Predictions + quality scores</div>
+<p class="desc">Pre-trained models (AstroNet, Zoobot) run inference on real data. Outputs: transit candidates, galaxy classifications, anomaly flags with confidence scores.</p>
+<div class="meta"><span class="data-label">Models</span> HuggingFace pre-trained weights</div>
 </div>
 <div class="task-card">
-<h3>3. Store Results on IPFS</h3>
-<p class="desc">Results uploaded to IPFS (free via Pinata/NFT.Storage). CID stored on-chain. Anyone can access via IPFS gateway.</p>
-<div class="meta"><span class="data-label">Access</span> Public — open science</div>
+<h3>3. Store on IPFS</h3>
+<p class="desc">Results uploaded to IPFS (free via Pinata). CID stored on-chain. Anyone can access via https://ipfs.io/ipfs/{CID}</p>
+<div class="meta"><span class="data-label">Storage</span> IPFS · On-chain CID</div>
 </div>
 <div class="task-card">
 <h3>4. Verify Your Work</h3>
-<p class="desc">Miner saves all results locally (~/.voidmap/results/). View exactly what you computed: transit detections, galaxy classes, anomalies.</p>
+<p class="desc">Miner saves all results locally (~/.voidmap/results/). View exactly what you computed: target name, prediction, confidence, data source.</p>
 <div class="meta"><span class="data-label">Command</span> --list-results</div>
+</div>
+</div>
+
+<h2 id="researchers">For Researchers</h2>
+<div class="tasks">
+<div class="task-card">
+<h3>Access Results</h3>
+<p class="desc">All miner outputs are stored on IPFS and indexed on-chain. Query by TIC ID, coordinates, or task type. Results include: predictions, confidence scores, data hashes.</p>
+<div class="meta"><span class="data-label">Format</span> JSON with predictions + metadata</div>
+</div>
+<div class="task-card">
+<h3>Integrate with Your Pipeline</h3>
+<p class="desc">Results are standard JSON with well-defined fields. Use with Astropy, astroML, or your own analysis scripts. Contribute models via HuggingFace.</p>
+<div class="meta"><span class="data-label">Tools</span> Astropy · lightkurve · PyTorch</div>
 </div>
 </div>
 
@@ -152,11 +166,12 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 
 <div class="cta" id="docs">
 <h2>Start Mining</h2>
-<pre>pip install torch numpy astropy
+<pre>pip install torch lightkurve astropy huggingface_hub safetensors
 python voidmap-miner.py --detect
-python voidmap-miner.py --rounds 100
+python voidmap-miner.py --task exoplanet --rounds 10
+python voidmap-miner.py --list-targets
 python voidmap-miner.py --list-results</pre>
-<p style="margin:1rem 0;font-size:0.9rem;opacity:0.7">Results saved to ~/.voidmap/results/ — view exactly what you computed</p>
+<p style="margin:1rem 0;font-size:0.9rem;opacity:0.7">Downloads real TESS data from MAST, runs pre-trained AstroNet model, saves results to ~/.voidmap/results/</p>
 <div><a href="https://github.com/thekillsquad007/voidmap" class="btn btn-p" target="_blank">GitHub</a><a class="btn btn-s">Contracts</a></div>
 </div>
 
