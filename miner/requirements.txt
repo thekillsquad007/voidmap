@@ -5,12 +5,13 @@ numpy>=1.24
 # Astronomical data
 astropy>=5.0
 lightkurve>=2.4
+scipy>=1.10
 
 # Model weights
 huggingface_hub>=0.14
 safetensors>=0.4
 
-# IPFS (for result distribution)
+# IPFS
 ipfshttpclient>=0.8
 
 # Image processing
@@ -18,3 +19,9 @@ Pillow>=9.0
 
 # HTTP requests
 requests>=2.28
+
+# Mining pool
+websockets>=11.0
+
+# Scikit-learn (for anomaly detection)
+scikit-learn>=1.2
