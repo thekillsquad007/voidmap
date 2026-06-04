@@ -10,6 +10,7 @@ Usage:
     cid = upload_result(result_dict)
     print(f"Result at: https://ipfs.io/ipfs/{cid}")
 """
+import hashlib
 import json
 import os
 import time
@@ -90,13 +91,16 @@ def upload_to_pinata(data: dict, api_key: str, api_secret: str) -> str:
 
 
 def save_locally(data: dict) -> str:
-    """Save result locally as fallback."""
+    """Save result locally as fallback. Returns a content-based hash
+    (sha256 of the JSON data) so on-chain records always contain a
+    valid hash, not a file path."""
     filename = f"result_{data.get('task', 'unknown')}_{int(time.time())}.json"
     filepath = RESULTS_DIR / filename
+    content = json.dumps(data, sort_keys=True)
     with open(filepath, "w") as f:
-        json.dump(data, f, indent=2)
-    # Return a local path as pseudo-CID
-    return f"local://{filepath}"
+        f.write(content)
+    content_hash = hashlib.sha256(content.encode()).hexdigest()
+    return f"sha256:{content_hash}"
 
 
 def upload_result(result: dict, miner_id: str = "unknown") -> str:
@@ -128,8 +132,8 @@ def upload_batch(results: list, miner_id: str = "unknown") -> list:
 
 def get_result_url(cid: str) -> str:
     """Get URL to access result on IPFS gateway."""
-    if cid.startswith("local://"):
-        return f"file://{cid[8:]}"
+    if cid.startswith("sha256:"):
+        return f"local:{cid}"
     return f"https://ipfs.io/ipfs/{cid}"
 
 

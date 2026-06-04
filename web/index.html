@@ -158,11 +158,20 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 </div>
 </div>
 
-<h2 id="miners">Miner Leaderboard</h2>
-<table><thead><tr><th>Miner</th><th>Total Score</th><th>Submissions</th><th>Avg Quality</th><th>Top Task</th></tr></thead><tbody id="leaderboard"></tbody></table>
+  <h2 id="miners">Miner Leaderboard</h2>
+  <div class="stat-card" style="text-align:center;padding:2rem">
+    <div class="l">Leaderboard</div>
+    <p style="margin:1rem 0;opacity:0.6">Connect to the Voidmap network to see live stats.</p>
+    <p style="font-size:0.8rem;opacity:0.4">Data will populate from the Results API once the network is live.</p>
+    <div style="margin-top:1rem"><a class="btn btn-p" id="connectBtn" style="cursor:pointer">Connect Wallet</a></div>
+  </div>
 
-<h2>Recent Submissions</h2>
-<table><thead><tr><th>Block</th><th>Miner</th><th>Task</th><th>Quality</th><th>Samples</th><th>IPFS</th></tr></thead><tbody id="submissions"></tbody></table>
+  <h2>Recent Submissions</h2>
+  <div class="stat-card" style="text-align:center;padding:2rem">
+    <div class="l">Submissions</div>
+    <p style="margin:1rem 0;opacity:0.6">Submissions will appear here once miners are active on the network.</p>
+    <p style="font-size:0.8rem;opacity:0.4">Query the <code style="color:var(--accent2)">/api/v1/submissions</code> endpoint for live data.</p>
+  </div>
 
 <div class="cta" id="docs">
 <h2>Start Mining</h2>
@@ -178,19 +187,13 @@ python voidmap-miner.py --list-results</pre>
 <footer>◆ Voidmap — Real computation. Real science. Real rewards.</footer>
 </div>
 
-<script>
-const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
-function r(){canvas.width=innerWidth;canvas.height=innerHeight}r();addEventListener('resize',r);
-for(let i=0;i<300;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2});
-function d(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const t of stars){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=canvas.width;if(t.x>canvas.width)t.x=0;if(t.y<0)t.y=canvas.height;if(t.y>canvas.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
-
-const miners=['0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18','0x8B2f96Bf5B5c5f5eB5c5b5D5A5e5F5c5B5a5b5C5','0xDeaDbeefdEAdbeefdEadbeefDeAdbEefDeAdbEef','0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b','0x9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b','0xba5e35Cc6634C0532925a3b844Bc9e7595f2b99','0xBeEfBabeF00dCafeBabeF00dCafeBabeF00dCafe','0xccCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCcCc'];
-const tasks=['Exoplanet','Galaxy','Anomaly'];
-const rn=(m,x)=>Math.floor(Math.random()*(x-m+1))+m;
-const lb=document.getElementById('leaderboard');lb.innerHTML='';
-for(let i=0;i<8;i++){const s=rn(50,999),n=rn(10,500),q=rn(60,98);lb.innerHTML+=`<tr><td class="addr">${miners[i].slice(0,12)}..</td><td>${s}</td><td>${n}</td><td>${q}</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td></tr>`}
-const sub=document.getElementById('submissions');sub.innerHTML='';
-for(let i=0;i<12;i++){const b=1247893-i,q=rn(50,99),ipfs='Qm'+Array.from({length:10},()=>Math.floor(Math.random()*16).toString(16)).join('');sub.innerHTML+=`<tr><td class="hash">#${b}</td><td class="addr">${miners[i%8].slice(0,10)}..</td><td><span class="badge ${['bg','bb','bg'][i%3]}">${tasks[i%3]}</span></td><td>${q}/100</td><td>${rn(50,500)}</td><td class="hash" title="View on IPFS">${ipfs.slice(0,12)}..</td></tr>`}
-</script>
+  <script>
+  const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+  function r(){canvas.width=innerWidth;canvas.height=innerHeight}r();addEventListener('resize',r);
+  for(let i=0;i<300;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2});
+  function d(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const t of stars){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=canvas.width;if(t.x>canvas.width)t.x=0;if(t.y<0)t.y=canvas.height;if(t.y>canvas.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
+  document.getElementById('connectBtn')?.addEventListener('click',async()=>{
+    if(typeof window.ethereum!=='undefined'){try{const a=await window.ethereum.request({method:'eth_requestAccounts'});document.getElementById('connectBtn').textContent=a[0].slice(0,6)+'..'+a[0].slice(-4)}catch(e){document.getElementById('connectBtn').textContent='Rejected'}}else{document.getElementById('connectBtn').textContent='No Wallet'}});
+  </script>
 </body>
 </html>

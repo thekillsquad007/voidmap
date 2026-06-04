@@ -38,7 +38,7 @@ except ImportError:
 # ─── Pool Configuration ───────────────────────────────────
 POOL_PORT = int(os.environ.get("VOIDMAP_POOL_PORT", "8546"))
 MIN_QUALITY = 50
-SHARE_DIFFICULTY = 18  # leading zeros in share hash
+SHARE_DIFFICULTY = 4 # leading zeros in share hash (aligned with pool_client)
 MAX_MINERS = 1000
 WORK_EXPIRY = 300  # seconds before work expires
 

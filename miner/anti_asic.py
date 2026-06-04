@@ -15,6 +15,7 @@ Defense layers:
 """
 import hashlib
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -135,6 +136,33 @@ ARCHITECTURES = {
     "convnext": GalaxyConvNeXT,
 }
 
+MODEL_VARIANTS = {
+    "cnn": {
+        "name": "TransitCNN",
+        "params": "~500K",
+        "memory_mb": 50,
+        "description": "1D CNN for transit detection",
+    },
+    "transformer": {
+        "name": "TransitTransformer",
+        "params": "~2M",
+        "memory_mb": 200,
+        "description": "Transformer with attention for light curves",
+    },
+    "mamba": {
+        "name": "TransitMamba",
+        "params": "~1M",
+        "memory_mb": 100,
+        "description": "State-space model for time series",
+    },
+    "convnext": {
+        "name": "GalaxyConvNeXT",
+        "params": "~15M",
+        "memory_mb": 500,
+        "description": "ConvNeXT for galaxy morphology",
+    },
+}
+
 
 # ─── Anti-ASIC Measures ───────────────────────────────────
 
@@ -152,7 +180,7 @@ class AntiASIC:
         self.current_architecture = "cnn"
         self.block_num = 0
         self.last_rotation = 0
-        self.weight_seed = int(time.time())
+        self.weight_seed = int.from_bytes(os.urandom(32), "big")
 
     def should_rotate_architecture(self) -> bool:
         """Check if it's time to switch model architecture."""
@@ -164,7 +192,7 @@ class AntiASIC:
         architectures.remove(self.current_architecture)
         self.current_architecture = random.choice(architectures)
         self.last_rotation = self.block_num
-        self.weight_seed = int(time.time())
+        self.weight_seed = int.from_bytes(os.urandom(32), "big")
         return self.current_architecture
 
     def get_random_batch_size(self) -> int:
@@ -227,7 +255,7 @@ class AntiASIC:
         access_pattern = self.get_data_access_pattern(data_len)
 
         # Challenge hash
-        challenge_seed = f"{block_num}:{arch}:{batch_size}:{time.time()}"
+        challenge_seed = f"{block_num}:{arch}:{batch_size}:{os.urandom(16).hex()}"
         challenge_hash = hashlib.sha256(challenge_seed.encode()).hexdigest()
 
         return {

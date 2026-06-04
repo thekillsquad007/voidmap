@@ -180,74 +180,84 @@ class PoolClient:
 
     async def run(self):
         """Main mining loop connected to pool."""
-        print(f"\n  ◆ VOIDMAP POOL CLIENT ◆")
-        print(f"  Pool: {self.pool_url}")
-        print(f"  Miner ID: {self.miner_id}")
-        print(f"  Device: {self.device}")
+        print(f"\n ◆ VOIDMAP POOL CLIENT ◆")
+        print(f" Pool: {self.pool_url}")
+        print(f" Miner ID: {self.miner_id}")
+        print(f" Device: {self.device}")
 
-        try:
-            async with websockets.connect(self.pool_url) as ws:
-                self.ws = ws
+        max_retries = 10
+        retry_delay = 5
+        retries = 0
 
-                # Authenticate
-                await ws.send(json.dumps({
-                    "type": "auth",
-                    "miner_id": self.miner_id,
-                }))
-                response = json.loads(await ws.recv())
-                if response.get("type") == "auth_ok":
-                    print(f"  Authenticated. Pool stats: {response.get('pool_stats', {})}")
-                else:
-                    print(f"  Auth failed: {response}")
-                    return
+        while self.running and retries < max_retries:
+            try:
+                async with websockets.connect(self.pool_url) as ws:
+                    self.ws = ws
+                    retries = 0
 
-                # Mining loop
-                while self.running:
-                    # Request work
-                    await ws.send(json.dumps({"type": "get_work", "task_id": 1}))
-                    work_msg = json.loads(await ws.recv())
-
-                    if work_msg.get("type") != "work":
-                        print(f"  Unexpected response: {work_msg}")
-                        await asyncio.sleep(1)
-                        continue
-
-                    work = work_msg["work"]
-                    print(f"\n  Work received: {work['work_id']} (block {work['block_num']})")
-                    print(f"  Architecture: {work['model_variant']}, batch: {work['batch_size']}")
-
-                    # Process work
-                    result = self.process_work(work)
-                    if result is None:
-                        print(f"  Work processing failed, requesting new work")
-                        continue
-
-                    print(f"  Result: quality={result.get('quality_score', 0)}")
-
-                    # Compute and submit share
-                    share = self.compute_share(work, result)
+                    # Authenticate
                     await ws.send(json.dumps({
-                        "type": "submit_share",
-                        "share": share,
+                        "type": "auth",
+                        "miner_id": self.miner_id,
                     }))
-
                     response = json.loads(await ws.recv())
-                    if response.get("type") == "share_accepted":
-                        print(f"  Share accepted! Total: {response.get('total_accepted')}")
+                    if response.get("type") == "auth_ok":
+                        print(f" Authenticated. Pool stats: {response.get('pool_stats', {})}")
                     else:
-                        print(f"  Share rejected: {response.get('reason')}")
+                        print(f" Auth failed: {response}")
+                        return
 
-                    # Brief pause
-                    await asyncio.sleep(1)
+                    # Mining loop
+                    while self.running:
+                        # Request work
+                        await ws.send(json.dumps({"type": "get_work", "task_id": 1}))
+                        work_msg = json.loads(await ws.recv())
 
-        except websockets.exceptions.ConnectionClosed:
-            print("  Connection closed, reconnecting...")
-            await asyncio.sleep(5)
-            await self.run()
-        except Exception as e:
-            print(f"  Error: {e}")
-            await asyncio.sleep(5)
-            await self.run()
+                        if work_msg.get("type") != "work":
+                            print(f" Unexpected response: {work_msg}")
+                            await asyncio.sleep(1)
+                            continue
+
+                        work = work_msg["work"]
+                        print(f"\n Work received: {work['work_id']} (block {work['block_num']})")
+                        print(f" Architecture: {work['model_variant']}, batch: {work['batch_size']}")
+
+                        # Process work
+                        result = self.process_work(work)
+                        if result is None:
+                            print(f" Work processing failed, requesting new work")
+                            continue
+
+                        print(f" Result: quality={result.get('quality_score', 0)}")
+
+                        # Compute and submit share
+                        share = self.compute_share(work, result)
+                        await ws.send(json.dumps({
+                            "type": "submit_share",
+                            "share": share,
+                        }))
+
+                        response = json.loads(await ws.recv())
+                        if response.get("type") == "share_accepted":
+                            print(f" Share accepted! Total: {response.get('total_accepted')}")
+                        else:
+                            print(f" Share rejected: {response.get('reason')}")
+
+                        # Brief pause
+                        await asyncio.sleep(1)
+
+            except websockets.exceptions.ConnectionClosed:
+                retries += 1
+                print(f" Connection closed, retry {retries}/{max_retries} in {retry_delay}s...")
+                await asyncio.sleep(retry_delay)
+            except Exception as e:
+                retries += 1
+                print(f" Error: {e}, retry {retries}/{max_retries} in {retry_delay}s...")
+                await asyncio.sleep(retry_delay)
+
+        if retries >= max_retries:
+            print(" Max retries reached, stopping.")
+            self.running = False
 
 
 def main():

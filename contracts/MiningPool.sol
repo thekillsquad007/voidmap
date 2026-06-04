@@ -62,17 +62,18 @@ contract MiningPool is Ownable, ReentrancyGuard {
         bool active;
     }
 
-    struct Pool {
-        address operator;
-        address feeRecipient;
-        string name;
-        uint256 totalShares;
-        uint256 totalSubmissions;
-        bool active;
-        mapping(address => bool) isMember;
-        mapping(address => uint256) memberShares;
-        address[] members;
-    }
+struct Pool {
+    address operator;
+    address feeRecipient;
+    string name;
+    uint256 totalShares;       // total shares contributed by members (for reward distribution tracking)
+    uint256 totalFeeAccumulated; // accumulated pool fees (withdrawable by operator)
+    uint256 totalSubmissions;
+    bool active;
+    mapping(address => bool) isMember;
+    mapping(address => uint256) memberShares;
+    address[] members;
+}
 
     // Storage
     mapping(uint256 => Submission) public submissions;
@@ -86,6 +87,8 @@ contract MiningPool is Ownable, ReentrancyGuard {
 
     uint256 public taskCount;
     uint256 public poolCount;
+    uint256 public constant SUBMISSION_COOLDOWN = 12 seconds; // ~1 block on Base L2
+    mapping(address => uint256) public lastSubmissionTime;
 
     // Events
     event WorkSubmitted(
@@ -178,8 +181,24 @@ contract MiningPool is Ownable, ReentrancyGuard {
         require(pool.isMember[miner], "Not member");
 
         pool.isMember[miner] = false;
-        // Note: member remains in members array but is marked inactive
+        uint256 shares = pool.memberShares[miner];
+        if (pool.totalShares >= shares) {
+            pool.totalShares -= shares;
+        } else {
+            pool.totalShares = 0;
+        }
+        pool.memberShares[miner] = 0;
         emit PoolMemberRemoved(poolId, miner);
+    }
+
+    function withdrawPoolFees(uint256 poolId) external nonReentrant {
+        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
+        Pool storage pool = pools[poolId];
+        require(pool.operator == msg.sender, "Not pool operator");
+        uint256 amount = pool.totalFeeAccumulated;
+        require(amount > 0, "No fees to withdraw");
+        pool.totalFeeAccumulated = 0;
+        token.mintMinerReward(pool.feeRecipient, amount, 0, 0);
     }
 
     /**
@@ -198,14 +217,14 @@ contract MiningPool is Ownable, ReentrancyGuard {
     function getPoolStats(uint256 poolId) external view returns (
         string memory name,
         address operator,
-        uint256 totalShares,
-        uint256 totalSubmissions,
+        uint256 accumulatedFees,
+        uint256 poolTotalSubmissions,
         uint256 memberCount,
         bool active
     ) {
         require(poolId > 0 && poolId <= poolCount, "Invalid pool");
         Pool storage pool = pools[poolId];
-        return (pool.name, pool.operator, pool.totalShares, pool.totalSubmissions, pool.members.length, pool.active);
+        return (pool.name, pool.operator, pool.totalFeeAccumulated, pool.totalSubmissions, pool.members.length, pool.active);
     }
 
     // ─── Work Submission (Individual) ─────────────────────────────
@@ -220,7 +239,7 @@ contract MiningPool is Ownable, ReentrancyGuard {
         uint256 samples,
         uint256 durationMs
     ) external nonReentrant returns (uint256) {
-        return _submitWork(taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs, 0);
+        return _submitWork(msg.sender, taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs, 0);
     }
 
     // ─── Work Submission (Pool) ───────────────────────────────────
@@ -238,6 +257,7 @@ contract MiningPool is Ownable, ReentrancyGuard {
      * @param durationMs Computation time
      */
     function submitPoolWork(
+        uint256 poolId,
         uint256 taskId,
         address miner,
         bytes32 inputHash,
@@ -248,15 +268,17 @@ contract MiningPool is Ownable, ReentrancyGuard {
         uint256 samples,
         uint256 durationMs
     ) external nonReentrant returns (uint256) {
-        require(msg.sender != miner, "Cannot submit for yourself");
-        // Note: In production, verify msg.sender is pool operator
-        // For now, anyone can submit on behalf of a miner
-        return _submitWork(taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs, 0);
+        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
+        require(pools[poolId].operator == msg.sender, "Not pool operator");
+        require(pools[poolId].isMember[miner], "Not pool member");
+        require(miner != msg.sender, "Cannot submit for yourself");
+        return _submitWork(miner, taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs, poolId);
     }
 
     // ─── Internal Submission ──────────────────────────────────────
 
     function _submitWork(
+        address miner,
         uint256 taskId,
         bytes32 inputHash,
         bytes32 outputHash,
@@ -273,10 +295,23 @@ contract MiningPool is Ownable, ReentrancyGuard {
         require(quality <= 100, "Quality > 100");
         require(samples > 0, "Samples > 0");
         require(bytes(ipfsCID).length > 0, "IPFS CID required");
+        require(
+            lastSubmissionTime[miner] == 0 || lastSubmissionTime[miner] + SUBMISSION_COOLDOWN <= block.timestamp,
+            "Cooldown"
+        );
+
+        // Apply deterministic noise from inputHash to quality to prevent
+        // gaming: miners can't perfectly predict final quality score
+        uint256 noise = uint256(keccak256(abi.encodePacked(inputHash, outputHash, block.timestamp))) % 10;
+        if (quality >= MIN_QUALITY + noise) {
+            quality -= noise;
+        } else {
+            quality = MIN_QUALITY; // floor at minimum
+        }
 
         submissionCount++;
         submissions[submissionCount] = Submission(
-            msg.sender,
+            miner,
             taskId,
             inputHash,
             outputHash,
@@ -289,31 +324,37 @@ contract MiningPool is Ownable, ReentrancyGuard {
             poolId
         );
 
-        // Update stats
-        totalQuality[msg.sender] += quality;
-        totalSubmissions[msg.sender]++;
-        totalSamplesProcessed[msg.sender] += samples;
-        minerSubmissions[msg.sender].push(submissionCount);
-        taskMiners[taskId].push(msg.sender);
+        lastSubmissionTime[miner] = block.timestamp;
+
+        // Update stats for the actual miner
+        totalQuality[miner] += quality;
+        totalSubmissions[miner]++;
+        totalSamplesProcessed[miner] += samples;
+        minerSubmissions[miner].push(submissionCount);
+        taskMiners[taskId].push(miner);
         tasks[taskId].totalSamples += samples;
         tasks[taskId].totalSubmissions++;
 
         // Calculate reward with quality multiplier
         uint256 multiplier = _qualityMultiplier(quality);
         uint256 reward = (BASE_REWARD * quality * multiplier) / DIVISOR;
+        uint256 paid = reward;
 
         // If pool submission, deduct fee and distribute to pool
         if (poolId > 0) {
             uint256 poolFee = (reward * POOL_FEE_BPS) / 10000;
-            uint256 minerReward = reward - poolFee;
-            token.mintMinerReward(msg.sender, minerReward, taskId, quality);
-            // Pool fee stays in contract (operator can withdraw)
+            paid = reward - poolFee;
+            token.mintMinerReward(miner, paid, taskId, quality);
+            Pool storage pool = pools[poolId];
+            pool.totalFeeAccumulated += poolFee;
+            pool.memberShares[miner] += paid;
+            pool.totalShares += paid;
         } else {
-            token.mintMinerReward(msg.sender, reward, taskId, quality);
+            token.mintMinerReward(miner, reward, taskId, quality);
         }
 
-        emit WorkSubmitted(submissionCount, msg.sender, taskId, quality, samples, ipfsCID, poolId);
-        emit RewardPaid(msg.sender, reward, quality);
+        emit WorkSubmitted(submissionCount, miner, taskId, quality, samples, ipfsCID, poolId);
+        emit RewardPaid(miner, paid, quality);
         return submissionCount;
     }
 
@@ -337,13 +378,13 @@ contract MiningPool is Ownable, ReentrancyGuard {
     }
 
     function getMinerStats(address miner) external view returns (
-        uint256 submissions,
+        uint256 minerSubmissions,
         uint256 avgQuality,
-        uint256 totalSamples
+        uint256 minerTotalSamples
     ) {
-        submissions = totalSubmissions[miner];
-        totalSamples = totalSamplesProcessed[miner];
-        avgQuality = submissions > 0 ? totalQuality[miner] / submissions : 0;
+        minerSubmissions = totalSubmissions[miner];
+        minerTotalSamples = totalSamplesProcessed[miner];
+        avgQuality = minerSubmissions > 0 ? totalQuality[miner] / minerSubmissions : 0;
     }
 
     // ─── Internal ─────────────────────────────────────────────────

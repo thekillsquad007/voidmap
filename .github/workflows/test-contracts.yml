@@ -17,7 +17,8 @@ jobs:
         with:
           submodules: recursive
       - uses: foundry-rs/foundry-toolchain@v1
-      - run: |
-          cd contracts
-          rm -rf lib/openzeppelin-contracts/fv lib/openzeppelin-contracts/test lib/openzeppelin-contracts/scripts
-          forge build --sizes
+    - run: |
+        cd contracts
+        rm -rf lib/openzeppelin-contracts/fv lib/openzeppelin-contracts/test lib/openzeppelin-contracts/scripts
+        forge build --sizes
+        forge test --skip "lib/openzeppelin-contracts/fv" -vv

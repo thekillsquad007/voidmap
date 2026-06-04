@@ -36,12 +36,13 @@ contract VoidmapToken is ERC20, Ownable {
         emit MinerReward(miner, amount, taskId, quality);
     }
 
-    function devClaim() external {
+    function devClaim(address to) external {
         require(msg.sender == devFund, "Only dev");
         require(block.timestamp >= vestingEnd, "Vesting");
+        require(to != address(0), "Invalid to");
         uint256 bal = balanceOf(devFund);
         if (bal > 0) {
-            _transfer(devFund, msg.sender, bal);
+            _transfer(devFund, to, bal);
             emit DevClaimed(bal);
         }
     }
