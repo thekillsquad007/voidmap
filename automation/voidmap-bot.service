@@ -1,0 +1,12 @@
+[Unit]
+Description=Voidmap Daily Stats Twitter Bot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=voidmap
+EnvironmentFile=/etc/voidmap/bot.env
+ExecStart=/usr/bin/python3 /opt/voidmap/automation/daily_stats.py
+StandardOutput=journal
+StandardError=journal

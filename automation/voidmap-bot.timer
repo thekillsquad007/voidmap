@@ -1,0 +1,12 @@
+[Unit]
+Description=Voidmap Daily Stats Timer
+Requires=voidmap-bot.service
+
+[Timer]
+# Run daily at 12:00 UTC
+OnCalendar=*-*-* 12:00:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
