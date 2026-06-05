@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voidmap"
+version = "0.1.0"
+description = "GPU mining for astronomy — earn VOID tokens by processing real NASA/ESA data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Voidmap" }
+]
+keywords = ["cryptocurrency", "mining", "astronomy", "ml", "gpu", "proof-of-useful-work"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: System :: Distributed Computing",
+]
+dependencies = [
+    "rich>=13.7.0",
+    "requests>=2.31.0",
+    "web3>=6.11.0",
+    "Pillow>=10.0.0",
+]
+
+[project.optional-dependencies]
+cuda = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "lightkurve>=2.4.0",
+    "astropy>=5.3.0",
+    "huggingface_hub>=0.19.0",
+    "safetensors>=0.4.0",
+]
+rocm = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+]
+mps = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+]
+cpu = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+]
+onnx = [
+    "onnx>=1.15.0",
+    "onnxruntime>=1.16.0",
+]
+data = [
+    "lightkurve>=2.4.0",
+    "astropy>=5.3.0",
+    "huggingface_hub>=0.19.0",
+    "safetensors>=0.4.0",
+]
+all = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "lightkurve>=2.4.0",
+    "astropy>=5.3.0",
+    "huggingface_hub>=0.19.0",
+    "safetensors>=0.4.0",
+    "onnx>=1.15.0",
+    "onnxruntime>=1.16.0",
+]
+
+[project.scripts]
+voidmap = "voidmap_miner.tui:main"
+voidmap-detect = "voidmap_miner.tui:detect_only"
+voidmap-mine = "voidmap_miner.tui:mine_cli"
+voidmap-card = "voidmap_miner.cards:main"
+
+[project.urls]
+Homepage = "https://github.com/thekillsquad007/voidmap"
+Documentation = "https://github.com/thekillsquad007/voidmap/blob/main/docs/README.md"
+"Bug Tracker" = "https://github.com/thekillsquad007/voidmap/issues"
+
+[tool.setuptools]
+packages = ["voidmap_miner"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+voidmap_miner = ["data/*.json", "data/*.txt"]

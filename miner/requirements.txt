@@ -1,6 +1,13 @@
-# Core ML
+# Core ML (one of these required)
 torch>=2.0
+onnxruntime>=1.16
+onnx>=1.15
 numpy>=1.24
+
+# AMD GPU support (optional — install ONE of these)
+# For AMD ROCm GPUs on Linux: pip install torch==2.5.1+rocm6.2 --index-url https://download.pytorch.org/whl/rocm6.2
+# For AMD/Intel GPUs on Windows: pip install onnxruntime-directml
+# For AMD/Intel GPUs on Linux: pip install onnxruntime-directml (experimental)
 
 # Astronomical data
 astropy>=5.0
