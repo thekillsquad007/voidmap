@@ -331,6 +331,6 @@ CUDA_VISIBLE_DEVICES=0 voidmap --task exoplanet
 ## See Also
 
 - [Mining Guide](Mining-Guide) — General mining setup
-- [HiveOS Installer](https://github.com/thekillsquad007/voidmap/blob/main/install_hiveos.sh) — HiveOS-specific install
-- [Local Installer](https://github.com/thekillsquad007/voidmap/blob/main/install_local.sh) — Desktop/workstation install
-- [Docker Setup](https://github.com/thekillsquad007/voidmap/blob/main/Dockerfile) — Containerized mining
+- [HiveOS Installer](../install_hiveos.sh) — HiveOS-specific install
+- [Local Installer](../install_local.sh) — Desktop/workstation install
+- [Docker Setup](../Dockerfile) — Containerized mining

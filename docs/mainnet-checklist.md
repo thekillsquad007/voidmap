@@ -42,7 +42,7 @@ This is the deployment checklist for Voidmap mainnet on Base L2. **Do not deploy
 ## Pre-Launch (Operational)
 
 - [ ] Wallet funded with > 0.005 ETH on Base mainnet (~$15 at current prices)
-- [ ] `DEPLOYER_PK` exported to environment (or use hardware wallet via frame/ledger)
+- [ ] Deployer key available (hardware wallet via frame/ledger recommended)
 - [ ] `DEV_ADDR` decided (recommend multisig for 4-year vesting)
 - [ ] `DAO_ADDR` decided (recommend Safe multisig for treasury)
 - [ ] Twitter @voidmap account created
@@ -82,7 +82,6 @@ This is the deployment checklist for Voidmap mainnet on Base L2. **Do not deploy
 ```bash
 cd contracts
 forge test -vv
-bash ../deploy-testnet.sh
 # Verify all addresses
 # Verify token symbol = VOID
 # Verify minter = pool
@@ -93,15 +92,8 @@ bash ../deploy-testnet.sh
 ### 2. Deploy to mainnet (Base)
 
 ```bash
-export DEPLOYER_PK=0x...  # mainnet deployer key
-export DEV_ADDR=0x...      # multisig for 4yr vesting
-export DAO_ADDR=0x...      # treasury multisig
-export RPC_URL=https://mainnet.base.org
-
-cd /path/to/voidmap
-bash deploy.sh
-
-# Save addresses to docs/contracts.md
+# See private operational runbook (not in this repo).
+# After deploy, save addresses to docs/contracts.md
 # Save addresses to README.md
 # Save addresses to web/index.html
 ```

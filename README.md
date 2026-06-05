@@ -169,8 +169,6 @@ voidmap/
 ├── web/
 │   └── index.html           # Static dashboard with live stats, wallet connect
 ├── docs/                    # GitBook (whitepaper, contracts, mining, etc.)
-├── deploy.sh                # Mainnet deploy to Base
-├── deploy-testnet.sh        # Testnet deploy to Base Sepolia
 ├── Dockerfile               # CUDA + ONNX DirectML Docker image
 ├── Dockerfile.hiveos        # ROCm-optimized for HiveOS
 ├── docker-compose.yml       # One-command deploy (NVIDIA + AMD)
@@ -228,53 +226,18 @@ voidmap/
 - `addPoolMember()` / `removePoolMember()` — Operator manages members
 - `withdrawPoolFees()` — Operator withdraws accumulated 2% fees
 
-## Deployment (Base L2)
+## Live Contracts (Base Sepolia)
 
-### Prerequisites
+| Contract | Address |
+|----------|---------|
+| VoidmapToken | `0x8AF20228A724d7420434791EAEA5F7D037865d35` |
+| MiningPool | `0x3768e25aFc129D4455e267819801f2b2914fA4A2` |
 
-- [Foundry](https://book.getfoundry.sh) installed (`curl -L https://foundry.paradigm.xyz | bash`)
-- Deployer wallet with ETH on Base (~0.0001 ETH recommended)
-- RPC endpoint (public: `https://mainnet.base.org` or Alchemy/Infura)
+Base mainnet contract addresses will be published here at mainnet launch.
 
-### Deploy to Testnet
+**After mainnet deploy, the token is ownerless.** Only the MiningPool can mint. Period.
 
-```bash
-export DEPLOYER_PK=0x...your_private_key...
-export DEV_ADDR=0x...your_dev_fund_address...   # defaults to deployer
-export DAO_ADDR=0x...your_dao_treasury...        # defaults to dev
-export RPC_URL=https://sepolia.base.org          # optional
-
-bash deploy-testnet.sh
-```
-
-This deploys both contracts in 2 steps:
-1. MiningPool (with placeholder token)
-2. VoidmapToken (with pool's address)
-3. `migrateMinter(pool)` to lock the minter
-4. Bootstrap proposer quorum with 1 VOID stake
-5. Create the 3 default tasks (Exoplanet, Galaxy, Anomaly)
-
-### Deploy to Mainnet
-
-```bash
-export DEPLOYER_PK=0x...your_mainnet_key...
-export DEV_ADDR=0x...your_multisig_or_cold_wallet...
-export RPC_URL=https://mainnet.base.org
-
-bash deploy.sh
-```
-
-**After deploy, the token is ownerless.** Only the MiningPool can mint. Period.
-
-### Verify on BaseScan
-
-```bash
-forge verify-contract <TOKEN_ADDRESS> VoidmapToken.sol:VoidmapToken \
-  --verifier blockscout --verifier-url https://api.basescan.org/api
-
-forge verify-contract <POOL_ADDRESS> MiningPool.sol:MiningPool \
-  --verifier blockscout --verifier-url https://api.basescan.org/api
-```
+The full source is in `contracts/`. Forge tests cover all protocol invariants — run `forge test -vv` to verify.
 
 ## Pool Setup (for pool operators)
 

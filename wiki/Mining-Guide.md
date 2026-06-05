@@ -128,7 +128,7 @@ Mine AND submit each valid result directly to the MiningPool contract:
 ```bash
 python voidmap-miner.py --task exoplanet --submit \
   --rpc https://mainnet.base.org \
-  --pk $DEPLOYER_PK
+  --pk $VOIDMAP_PK
 ```
 
 - Costs ~0.00001 ETH per submission (Base gas is cheap)
@@ -484,7 +484,7 @@ Ensure you've added `--device /dev/kfd --device /dev/dri --security-opt seccomp=
 # Testnet (Base Sepolia)
 python voidmap-miner.py --task exoplanet --submit \
   --rpc https://sepolia.base.org \
-  --pk $DEPLOYER_PK
+  --pk $VOIDMAP_PK
 ```
 
 ---

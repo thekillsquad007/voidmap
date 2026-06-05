@@ -1,8 +1,0 @@
-{
-  "token": "0x8AF20228A724d7420434791EAEA5F7D037865d35",
-  "pool": "0x3768e25aFc129D4455e267819801f2b2914fA4A2",
-  "dev": "0xfdADE8C9910D21ac3eEf0a9355E00c51d320a363",
-  "dao": "0xC3deCeb8Cf7507394bB25167B93FCf048fc4a7C8",
-  "deployer": "0xfdADE8C9910D21ac3eEf0a9355E00c51d320a363",
-  "rpc": "https://sepolia.base.org"
-}

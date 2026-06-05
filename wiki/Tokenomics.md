@@ -265,28 +265,6 @@ function executeTimelock(bytes32 proposalId) external;
 
 ---
 
-## Deployment
-
-```bash
-export DEPLOYER_PK=0x...  # needs ~$0.0001 ETH on Base
-export DEV_ADDR=0x...     # dev fund (multisig recommended)
-export DAO_ADDR=0x...     # treasury (defaults to DEV_ADDR)
-export RPC_URL=https://mainnet.base.org
-
-bash deploy.sh
-```
-
-The deploy script:
-1. Deploys MiningPool (with placeholder token)
-2. Deploys VoidmapToken (ownerless)
-3. Calls `migrateMinter(poolAddress)` — locks the minter
-4. Stakes 1 VOID as initial proposer (deployer)
-5. Creates 3 default tasks
-
-Total gas: ~3.5M gas (~0.00007 ETH at 19 Gwei).
-
----
-
 ## No Rug, No Team, No Promises
 
 - **No `Ownable`** — Token and pool are ownerless from day one

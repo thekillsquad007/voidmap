@@ -621,18 +621,6 @@ The contracts are deployed in 4 transactions:
 3. **`migrateMinter(poolAddress)`** — Locks the minter to MiningPool.
 4. **Bootstrap** — Deployer stakes 1 VOID as initial proposer, creates 3 default tasks.
 
-```bash
-# Set environment variables
-export DEPLOYER_PK=0x...  # Private key
-export DEV_ADDR=0x...      # Dev fund address
-export DAO_ADDR=0x...      # Treasury address (defaults to DEV_ADDR)
-export RPC_URL=https://mainnet.base.org  # or https://sepolia.base.org
-
-# Deploy
-bash deploy.sh  # mainnet
-bash deploy-testnet.sh  # testnet
-```
-
 ### Post-Deployment State
 
 After deployment:

@@ -109,20 +109,7 @@ After deployment, add your contract addresses here:
 | VoidmapToken (testnet) | `0x...` | Base Sepolia |
 | MiningPool (testnet) | `0x...` | Base Sepolia |
 
-Deploy with:
-```bash
-export DEPLOYER_PK=0x...
-export DEV_ADDR=0x...
-export RPC_URL=https://mainnet.base.org
-bash deploy.sh
-```
-
-The deploy script:
-1. Deploys MiningPool (with placeholder token)
-2. Deploys VoidmapToken (ownerless)
-3. Calls `migrateMinter(poolAddress)` — locks the minter
-4. Stakes 1 VOID as initial proposer
-5. Creates 3 default tasks (Exoplanet, Galaxy, Anomaly)
+The on-chain state after mainnet launch is fully ownerless: no `Ownable`, no multisig, no upgrade path, no team tokens. The full source is in `contracts/`; forge tests cover every protocol invariant.
 
 ---
 

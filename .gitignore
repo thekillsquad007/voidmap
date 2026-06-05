@@ -56,9 +56,12 @@ node_modules/
 miner/results/
 results/
 
-# Personal deploy artifacts
+# Personal deploy artifacts (operational, not showcase)
+deploy.sh
+deploy-testnet.sh
 deploy-local.json
 deploy-testnet-personal.json
+contracts/deploy-*.json
 
 # IPFS (large, regenerated)
 ipfs/
