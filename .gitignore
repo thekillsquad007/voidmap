@@ -7,11 +7,8 @@ out/
 cache/
 artifacts/
 typechain-types/
-
-# Environment
-.env
-.env.local
-.env.*.local
+build/
+dist/
 
 # Python
 __pycache__/
@@ -21,6 +18,14 @@ __pycache__/
 .Python
 venv/
 .venv/
+*.egg-info/
+*.egg
+
+# Solidity
+coverage/
+coverage.json
+lcov.info
+broadcast/
 
 # IDE
 .vscode/
@@ -34,3 +39,27 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Local data (user-specific, not for version control)
+.voidmap/
+*.dat
+*.sqlite
+*.db
+node_modules/
+
+# Mining results cache (regenerated on every run)
+miner/results/
+results/
+
+# Personal deploy artifacts
+deploy-local.json
+deploy-testnet-personal.json
+
+# IPFS (large, regenerated)
+ipfs/
+*.ipfs
