@@ -3,341 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How to Mine VOID — Step-by-Step Guide</title>
+<title>How to Mine VOID — Step-by-Step Guide · Voidmap</title>
 <meta name="description" content="Step-by-step guide to mining Voidmap. From install to your first VOID token in 5 minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-deep: #06091a;
-    --bg-mid: #0d1230;
-    --bg-light: #1a2050;
-    --accent-magenta: #ff3eb5;
-    --accent-cyan: #4dd0e1;
-    --accent-yellow: #ffd54f;
-    --accent-green: #66bb6a;
-    --accent-red: #ef5350;
-    --text-primary: #e8eaf6;
-    --text-dim: #9fa8da;
-    --text-faint: #5c6bc0;
-    --code-bg: #0a0d24;
-  }
+:root{
+  --bg:#03050d;--bg2:#070b1c;--bg3:#0d1428;
+  --fg:#e8ecf5;--fg2:#8b9bb8;--fg3:#5d6b86;--fg4:#3a4459;
+  --cyan:#4dd6ff;--cyan-dim:rgba(77,214,255,0.15);
+  --amber:#ffc857;--amber-dim:rgba(255,200,87,0.15);
+  --violet:#a78bfa;--violet-dim:rgba(167,139,250,0.15);
+  --red:#ff5c5c;--red-dim:rgba(255,92,92,0.15);
+  --green:#5ee89e;--green-dim:rgba(94,232,158,0.15);
+  --grad-cyan:linear-gradient(135deg,#4dd6ff 0%,#a78bfa 100%);
+  --grad-amber:linear-gradient(135deg,#ffc857 0%,#ff5c5c 100%);
+  --grad-nebula:radial-gradient(ellipse at 30% 20%,rgba(77,214,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(167,139,250,0.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 90%,rgba(255,200,87,0.04) 0%,transparent 40%);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  line-height:1.65;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:var(--grad-nebula);
+}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+.wrap{position:relative;z-index:1}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.85rem 2rem;position:fixed;top:0;width:100%;
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  background:rgba(3,5,13,0.75);
+  z-index:100;
+  border-bottom:1px solid rgba(77,214,255,0.08);
+  font-size:0.85rem;
+}
+nav .logo{
+  font-weight:800;font-size:1.05rem;letter-spacing:0.05em;
+  background:var(--grad-cyan);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-decoration:none;
+}
+nav .logo::before{content:'◇ ';opacity:0.8;-webkit-text-fill-color:var(--cyan)}
+nav .telemetry{
+  display:flex;align-items:center;gap:1rem;
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
+  color:var(--fg2);text-transform:uppercase;letter-spacing:0.08em;
+}
+nav .telemetry .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease-in-out infinite}
+nav .telemetry .sep{color:var(--fg4)}
+nav .telemetry .label{color:var(--fg3)}
+nav .telemetry .val{color:var(--cyan)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.25rem;font-weight:500;transition:color 0.2s}
+nav .nav-links a:hover{color:var(--cyan)}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
-    background: var(--bg-deep);
-    color: var(--text-primary);
-    line-height: 1.7;
-  }
+main{max-width:880px;margin:0 auto;padding:7rem 2rem 3rem;position:relative}
+.page-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid rgba(77,214,255,0.1)}
+.page-header .mission-id{
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:0.75rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.page-header .mission-id .line{width:24px;height:1px;background:var(--cyan)}
+.page-header h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.5rem}
+.page-header h1 .grad{background:var(--grad-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.page-header .subtitle{font-size:1.1rem;color:var(--fg2);max-width:640px}
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image:
-      radial-gradient(1px 1px at 25% 5%, white, transparent),
-      radial-gradient(1px 1px at 50% 25%, white, transparent),
-      radial-gradient(1.5px 1.5px at 75% 15%, #ffd54f, transparent),
-      radial-gradient(1px 1px at 10% 50%, white, transparent),
-      radial-gradient(2px 2px at 90% 60%, #4dd0e1, transparent);
-    background-size: 200% 200%;
-    opacity: 0.4;
-    z-index: -1;
-  }
+h2{font-size:1.6rem;font-weight:800;margin:3rem 0 1rem;letter-spacing:-0.02em}
+h3{font-size:1.05rem;font-weight:700;margin:1.75rem 0 0.5rem;letter-spacing:-0.01em;color:var(--fg)}
+h4{font-size:0.9rem;font-weight:700;margin:1.25rem 0 0.5rem;color:var(--cyan);text-transform:uppercase;letter-spacing:0.08em;font-family:'JetBrains Mono',monospace;font-size:0.75rem}
+p{margin-bottom:0.75rem;color:var(--fg2)}
+p strong,li strong{color:var(--fg);font-weight:600}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(77,214,255,0.3);transition:all 0.2s}
+a:hover{border-bottom-style:solid;border-bottom-color:var(--cyan)}
+code{font-family:'JetBrains Mono',monospace;font-size:0.85em;background:rgba(13,20,40,0.8);padding:0.1rem 0.4rem;border-radius:3px;color:var(--cyan);border:1px solid rgba(77,214,255,0.08)}
 
-  header {
-    background: linear-gradient(180deg, rgba(13, 18, 48, 0.95) 0%, rgba(13, 18, 48, 0.7) 100%);
-    border-bottom: 1px solid rgba(255, 62, 181, 0.2);
-    padding: 24px 48px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
-  }
+.toc{
+  background:rgba(7,11,28,0.5);border:1px solid rgba(77,214,255,0.1);
+  border-radius:8px;padding:1.5rem 2rem;margin:2rem 0 3rem;
+  backdrop-filter:blur(8px);
+}
+.toc h2{margin:0 0 0.75rem;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600}
+.toc ol{margin-left:1.5rem}
+.toc li{margin-bottom:0.35rem;color:var(--fg2);font-size:0.9rem}
+.toc a{color:var(--fg2);border-bottom:none;font-weight:500}
+.toc a:hover{color:var(--cyan)}
 
-  .header-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.step{
+  background:rgba(7,11,28,0.4);border:1px solid rgba(77,214,255,0.08);
+  border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;
+  position:relative;backdrop-filter:blur(8px);
+  border-left:2px solid var(--cyan);
+}
+.step-header{display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem}
+.step-number{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(77,214,255,0.08);border:1px solid rgba(77,214,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--cyan);font-size:0.95rem;
+  flex-shrink:0;
+}
+.step-title{font-size:1.25rem;font-weight:800;letter-spacing:-0.01em;color:var(--fg)}
+.step-time{
+  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
+  color:var(--amber);text-transform:uppercase;letter-spacing:0.1em;
+  margin-bottom:1rem;display:inline-block;
+  background:var(--amber-dim);padding:0.2rem 0.6rem;border-radius:3px;
+  border:1px solid rgba(255,200,87,0.15);
+}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.4em;
-    font-weight: 800;
-    color: var(--text-primary);
-    text-decoration: none;
-  }
+pre{
+  background:rgba(3,5,13,0.7);padding:1.1rem 1.25rem;
+  border-radius:6px;margin:1rem 0;font-size:0.8rem;line-height:1.6;
+  overflow-x:auto;border:1px solid rgba(77,214,255,0.1);
+  font-family:'JetBrains Mono',monospace;color:var(--fg);
+  position:relative;
+}
+pre::before{
+  content:'TERMINAL';position:absolute;top:0.4rem;right:0.75rem;
+  font-size:0.55rem;letter-spacing:0.15em;color:var(--fg3);
+  font-family:'JetBrains Mono',monospace;
+}
+pre code{background:none;padding:0;border:none;color:inherit;font-size:inherit}
 
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-    background: radial-gradient(circle at 30% 30%, var(--accent-magenta), var(--accent-cyan));
-    border-radius: 50%;
-    box-shadow: 0 0 24px rgba(255, 62, 181, 0.5);
-  }
+ol,ul{margin-left:1.5rem;margin-bottom:1rem;color:var(--fg2)}
+li{margin-bottom:0.4rem;line-height:1.6}
+li code{font-size:0.8em}
 
-  nav a {
-    color: var(--text-dim);
-    text-decoration: none;
-    margin-left: 24px;
-    font-size: 0.95em;
-  }
-  nav a:hover { color: var(--accent-cyan); }
+.platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0.6rem;margin:1rem 0}
+.platform{
+  background:rgba(13,20,40,0.5);border:1px solid rgba(77,214,255,0.08);
+  border-radius:6px;padding:0.85rem 1rem;
+  border-left:2px solid var(--cyan);
+}
+.platform-name{font-weight:700;color:var(--fg);font-size:0.9rem;margin-bottom:0.15rem}
+.platform-detail{font-size:0.75rem;color:var(--fg2);font-family:'JetBrains Mono',monospace;line-height:1.4}
 
-  main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 64px 48px;
-  }
+.tip,.warning,.note{
+  border-radius:6px;padding:0.85rem 1.1rem;margin:1rem 0;
+  font-size:0.88rem;line-height:1.55;
+}
+.tip{background:rgba(94,232,158,0.05);border-left:2px solid var(--green);color:var(--fg2)}
+.tip strong{color:var(--green)}
+.warning{background:rgba(255,92,92,0.05);border-left:2px solid var(--red);color:var(--fg2)}
+.warning strong{color:var(--red)}
+.note{background:rgba(77,214,255,0.05);border-left:2px solid var(--cyan);color:var(--fg2)}
+.note strong{color:var(--cyan)}
 
-  h1 {
-    font-size: 2.8em;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-magenta) 0%, var(--accent-cyan) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 16px;
-    line-height: 1.2;
-  }
+.next-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin:1.5rem 0}
+.next-step{
+  display:block;background:rgba(7,11,28,0.5);
+  border:1px solid rgba(77,214,255,0.1);border-radius:8px;
+  padding:1.25rem;text-decoration:none;
+  transition:all 0.2s;border-bottom:1px solid rgba(77,214,255,0.1) !important;
+}
+.next-step:hover{border-color:var(--cyan) !important;background:rgba(13,20,40,0.7);transform:translateY(-2px)}
+.next-step-title{font-weight:700;color:var(--fg);font-size:0.95rem;margin-bottom:0.3rem}
+.next-step-desc{font-size:0.8rem;color:var(--fg2);line-height:1.4}
 
-  .subtitle {
-    font-size: 1.2em;
-    color: var(--text-dim);
-    margin-bottom: 48px;
-  }
+footer{
+  text-align:center;padding:3rem 2rem 2.5rem;
+  border-top:1px solid rgba(77,214,255,0.08);margin-top:4rem;
+  font-size:0.8rem;color:var(--fg3);
+}
+footer p{margin-bottom:0.4rem;color:var(--fg3);font-size:0.85rem}
+footer a{color:var(--fg2);border-bottom:1px dotted var(--fg4)}
+footer a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 
-  .toc {
-    background: linear-gradient(135deg, rgba(26, 32, 80, 0.5) 0%, rgba(13, 18, 48, 0.5) 100%);
-    border: 1px solid rgba(77, 208, 225, 0.15);
-    border-radius: 12px;
-    padding: 24px 32px;
-    margin-bottom: 64px;
-  }
-
-  .toc h2 {
-    font-size: 1.1em;
-    color: var(--accent-cyan);
-    margin-bottom: 16px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .toc ol { padding-left: 20px; }
-  .toc li { margin: 8px 0; }
-  .toc a { color: var(--text-primary); text-decoration: none; }
-  .toc a:hover { color: var(--accent-cyan); }
-
-  .step {
-    background: linear-gradient(135deg, rgba(26, 32, 80, 0.4) 0%, rgba(13, 18, 48, 0.4) 100%);
-    border: 1px solid rgba(77, 208, 225, 0.1);
-    border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 32px;
-  }
-
-  .step-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .step-number {
-    background: linear-gradient(135deg, var(--accent-magenta), var(--accent-cyan));
-    color: var(--bg-deep);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.2em;
-    flex-shrink: 0;
-  }
-
-  .step-title {
-    font-size: 1.6em;
-    font-weight: 700;
-  }
-
-  .step-time {
-    color: var(--accent-yellow);
-    font-size: 0.85em;
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    font-size: 1.2em;
-    color: var(--accent-cyan);
-    margin: 24px 0 12px;
-  }
-
-  p, li { color: var(--text-primary); }
-  p { margin-bottom: 12px; }
-
-  ul, ol { padding-left: 24px; margin-bottom: 16px; }
-  li { margin: 6px 0; }
-
-  pre {
-    background: var(--code-bg);
-    border: 1px solid rgba(77, 208, 225, 0.1);
-    border-radius: 8px;
-    padding: 16px 20px;
-    overflow-x: auto;
-    margin: 12px 0 20px;
-    font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
-    font-size: 0.9em;
-    line-height: 1.5;
-  }
-
-  code {
-    background: rgba(77, 208, 225, 0.1);
-    color: var(--accent-cyan);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: "SF Mono", "Cascadia Code", monospace;
-    font-size: 0.9em;
-  }
-
-  pre code {
-    background: transparent;
-    color: var(--text-primary);
-    padding: 0;
-  }
-
-  .note {
-    background: rgba(255, 213, 79, 0.08);
-    border-left: 3px solid var(--accent-yellow);
-    padding: 12px 16px;
-    border-radius: 4px;
-    margin: 16px 0;
-    color: var(--text-primary);
-  }
-
-  .warning {
-    background: rgba(239, 83, 80, 0.08);
-    border-left: 3px solid var(--accent-red);
-    padding: 12px 16px;
-    border-radius: 4px;
-    margin: 16px 0;
-  }
-
-  .tip {
-    background: rgba(102, 187, 106, 0.08);
-    border-left: 3px solid var(--accent-green);
-    padding: 12px 16px;
-    border-radius: 4px;
-    margin: 16px 0;
-  }
-
-  .checklist {
-    list-style: none;
-    padding: 0;
-  }
-  .checklist li::before {
-    content: "☐";
-    color: var(--accent-cyan);
-    font-weight: 700;
-    margin-right: 12px;
-  }
-
-  .platform-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin: 16px 0 24px;
-  }
-
-  .platform {
-    background: rgba(13, 18, 48, 0.5);
-    border: 1px solid rgba(77, 208, 225, 0.15);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-  }
-
-  .platform-name { font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px; }
-  .platform-detail { font-size: 0.85em; color: var(--text-dim); }
-
-  .next-steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
-    margin: 32px 0;
-  }
-
-  .next-step {
-    background: linear-gradient(135deg, rgba(26, 32, 80, 0.5) 0%, rgba(13, 18, 48, 0.5) 100%);
-    border: 1px solid rgba(77, 208, 225, 0.15);
-    border-radius: 12px;
-    padding: 20px;
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: all 0.2s;
-  }
-
-  .next-step:hover {
-    border-color: var(--accent-cyan);
-    transform: translateY(-2px);
-  }
-
-  .next-step-title {
-    font-weight: 700;
-    color: var(--accent-cyan);
-    margin-bottom: 6px;
-  }
-
-  .next-step-desc {
-    font-size: 0.9em;
-    color: var(--text-dim);
-  }
-
-  footer {
-    border-top: 1px solid rgba(255, 62, 181, 0.2);
-    padding: 32px 48px;
-    margin-top: 64px;
-    text-align: center;
-    color: var(--text-faint);
-    font-size: 0.9em;
-  }
-
-  footer a { color: var(--accent-cyan); text-decoration: none; }
-
-  @media (max-width: 768px) {
-    header, main, footer { padding-left: 24px; padding-right: 24px; }
-    h1 { font-size: 2em; }
-    .step { padding: 20px; }
-  }
+@media (max-width:980px){
+  nav .telemetry{display:none}
+  main{padding:6rem 1.25rem 2rem}
+  .step{padding:1.25rem}
+  .toc{padding:1.25rem 1.5rem}
+}
+@media (max-width:768px){
+  nav .nav-links a{margin-left:0.75rem;font-size:0.8rem}
+  pre{font-size:0.72rem}
+}
 </style>
 </head>
 <body>
+<canvas id="stars"></canvas>
+<canvas id="stars2"></canvas>
+<canvas id="stars3"></canvas>
+<div class="wrap">
 
-<header>
-  <div class="header-inner">
-    <a class="logo" href="index.html">
-      <div class="logo-icon"></div>
-      <span>VOIDMAP</span>
-    </a>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="howto.html">How to Mine</a>
-      <a href="explorer/">Explorer</a>
-      <a href="https://github.com/thekillsquad007/voidmap" target="_blank">GitHub</a>
-    </nav>
+<nav>
+  <a class="logo" href="index.html">VOIDMAP</a>
+  <div class="telemetry">
+    <span><span class="dot"></span></span>
+    <span><span class="label">Survey</span>&nbsp;<span class="val">TESS&nbsp;S56</span></span>
+    <span class="sep">/</span>
+    <span><span class="label">Epoch</span>&nbsp;<span class="val">0</span></span>
   </div>
-</header>
+  <div class="nav-links">
+    <a href="index.html#mission">Mission</a>
+    <a href="index.html#targets">Targets</a>
+    <a href="index.html#tasks">Tasks</a>
+    <a href="index.html#mechanics">Mechanics</a>
+    <a href="howto.html">How&nbsp;to&nbsp;Mine</a>
+    <a href="explorer/">Explorer</a>
+    <a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Wiki</a>
+  </div>
+</nav>
 
 <main>
-  <h1>How to Mine VOID</h1>
-  <p class="subtitle">A complete step-by-step guide. From zero to your first VOID token in about 5 minutes.</p>
+  <div class="page-header">
+    <div class="mission-id"><span class="line"></span>Procedure&nbsp;VM-001 · Mining Operations</div>
+    <h1>How to Mine <span class="grad">VOID</span></h1>
+    <p class="subtitle">A complete step-by-step guide. From zero to your first VOID token in about 5 minutes.</p>
+  </div>
 
   <div class="toc">
     <h2>Table of Contents</h2>
@@ -361,10 +246,9 @@
 
     <p>Voidmap works on virtually any GPU or CPU. Find out what you have:</p>
 
-    <h3>Windows</h3>
-    <pre><code># Open PowerShell
-wmic path win32_VideoController get name
-# Or just look in Device Manager → Display Adapters</code></pre>
+    <h3>Windows (PowerShell)</h3>
+    <pre><code>wmic path win32_VideoController get name
+# Or Device Manager → Display Adapters</code></pre>
 
     <h3>macOS</h3>
     <pre><code>system_profiler SPDisplaysDataType | grep "Chipset Model"</code></pre>
@@ -376,23 +260,23 @@ wmic path win32_VideoController get name
     <div class="platform-grid">
       <div class="platform">
         <div class="platform-name">NVIDIA</div>
-        <div class="platform-detail">Any GPU from GTX 1050 and up</div>
+        <div class="platform-detail">GTX 1050 and newer</div>
       </div>
       <div class="platform">
         <div class="platform-name">AMD</div>
-        <div class="platform-detail">RX 400 series and newer (RDNA / GCN 5.0+)</div>
+        <div class="platform-detail">RX 400+ · RDNA/GCN 5.0</div>
       </div>
       <div class="platform">
         <div class="platform-name">Apple Silicon</div>
-        <div class="platform-detail">M1, M2, M3, M4 (any)</div>
+        <div class="platform-detail">M1 · M2 · M3 · M4</div>
       </div>
       <div class="platform">
         <div class="platform-name">Intel</div>
-        <div class="platform-detail">Arc GPUs (A380, A770) or CPU</div>
+        <div class="platform-detail">Arc A380 / A770</div>
       </div>
       <div class="platform">
         <div class="platform-name">CPU only</div>
-        <div class="platform-detail">Always works, slowest</div>
+        <div class="platform-detail">Always works · slowest</div>
       </div>
     </div>
 
@@ -456,14 +340,14 @@ docker run -d --device /dev/kfd --device /dev/dri \
       <li>Install <a href="https://www.coinbase.com/wallet" target="_blank">Coinbase Wallet</a> or <a href="https://metamask.io" target="_blank">MetaMask</a></li>
       <li>Add the Base network:
         <ul>
-          <li>Network: Base</li>
+          <li>Network: <code>Base</code></li>
           <li>RPC: <code>https://mainnet.base.org</code></li>
           <li>Chain ID: <code>8453</code></li>
-          <li>Currency: ETH</li>
+          <li>Currency: <code>ETH</code></li>
           <li>Explorer: <code>https://basescan.org</code></li>
         </ul>
       </li>
-      <li>Fund with at least 0.001 ETH for gas (about $3)</li>
+      <li>Fund with at least <code>0.001 ETH</code> for gas (~$3)</li>
     </ol>
 
     <h3>Export your private key</h3>
@@ -475,8 +359,8 @@ docker run -d --device /dev/kfd --device /dev/dri \
 
     <p>To export from MetaMask:</p>
     <ol>
-      <li>Click your account icon → Account details</li>
-      <li>Click "Export Private Key"</li>
+      <li>Click your account icon → <strong>Account details</strong></li>
+      <li>Click <strong>Export Private Key</strong></li>
       <li>Enter your password</li>
       <li>Copy the key (starts with <code>0x</code>)</li>
     </ol>
@@ -501,7 +385,7 @@ voidmap-mine --pk 0xYOUR_KEY</code></pre>
     <p>You'll see a live dashboard showing your GPU, current task, predictions, and earnings. Keyboard shortcuts:</p>
     <ul>
       <li><code>q</code> — quit</li>
-      <li><code>p</code> — pause/resume</li>
+      <li><code>p</code> — pause / resume</li>
       <li><code>t</code> — switch task</li>
       <li><code>d</code> — show discoveries</li>
       <li><code>r</code> — show recent rounds</li>
@@ -617,7 +501,7 @@ sudo systemctl status voidmap</code></pre>
 
   <div class="step" id="troubleshoot">
     <div class="step-header">
-      <div class="step-number">❓</div>
+      <div class="step-number">?</div>
       <div class="step-title">Troubleshooting</div>
     </div>
 
@@ -631,7 +515,7 @@ sudo systemctl status voidmap</code></pre>
     <h3>"Cannot find cast"</h3>
     <div class="note">
       <strong>Cause:</strong> Foundry not installed.<br>
-      <strong>Fix:</strong> <code>curl -L https://foundry.paradigm.xyz | bash && foundryup</code>
+      <strong>Fix:</strong> <code>curl -L https://foundry.paradigm.xyz | bash &amp;&amp; foundryup</code>
     </div>
 
     <h3>"No TESS data found for TIC X"</h3>
@@ -649,15 +533,15 @@ sudo systemctl status voidmap</code></pre>
     <h3>Need more help?</h3>
     <ul>
       <li><a href="https://github.com/thekillsquad007/voidmap" target="_blank">GitHub</a> — file an issue</li>
-      <li><a href="https://twitter.com/voidmap" target="_blank">Twitter</a> — for quick questions</li>
-      <li><a href="docs/rocm-setup.md">AMD/ROCm Setup Guide</a> — if you have an AMD GPU</li>
+      <li><a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Documentation Wiki</a> — full reference</li>
+      <li><a href="https://github.com/thekillsquad007/voidmap/wiki/AMD-ROCm-Setup" target="_blank">AMD/ROCm Setup Guide</a> — if you have an AMD GPU</li>
     </ul>
   </div>
 
-  <h2 style="margin-top: 64px;">What's next?</h2>
+  <h2>What's next?</h2>
 
   <div class="next-steps">
-    <a class="next-step" href="https://github.com/thekillsquad007/voidmap">
+    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki">
       <div class="next-step-title">📖 Read the docs</div>
       <div class="next-step-desc">Deep dive on contracts, tokenomics, anti-ASIC</div>
     </a>
@@ -665,7 +549,7 @@ sudo systemctl status voidmap</code></pre>
       <div class="next-step-title">🌟 See discoveries</div>
       <div class="next-step-desc">Browse what other miners have found</div>
     </a>
-    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/blob/main/docs/whitepaper.md">
+    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki/Whitepaper">
       <div class="next-step-title">📄 Whitepaper</div>
       <div class="next-step-desc">Full protocol specification</div>
     </a>
@@ -678,14 +562,82 @@ sudo systemctl status voidmap</code></pre>
 
 <footer>
   <p>Voidmap — Proof of Useful Work on Base L2</p>
-  <p style="margin-top: 8px;">
+  <p>
     <a href="index.html">Home</a> ·
     <a href="howto.html">How to Mine</a> ·
     <a href="explorer/">Explorer</a> ·
-    <a href="https://github.com/thekillsquad007/voidmap">GitHub</a>
+    <a href="https://github.com/thekillsquad007/voidmap">GitHub</a> ·
+    <a href="https://github.com/thekillsquad007/voidmap/wiki">Wiki</a>
   </p>
-  <p style="margin-top: 8px;">No premine. No team. No admin keys. <a href="https://voidmap.org">voidmap.org</a></p>
+  <p>No premine · No team · No admin keys · <a href="https://voidmap.org">voidmap.org</a></p>
 </footer>
 
+</div>
+
+<script>
+// 3-layer parallax starfield (matches index.html)
+const starsCanvas = [
+  document.getElementById('stars'),
+  document.getElementById('stars2'),
+  document.getElementById('stars3')
+];
+const contexts = starsCanvas.map(c => c.getContext('2d'));
+const starLayers = [[], [], []];
+const starCounts = [80, 140, 240];
+const starSpeeds = [0.05, 0.12, 0.25];
+const starSizes = [0.4, 0.7, 1.1];
+
+function resize() {
+  starsCanvas.forEach(c => { c.width = innerWidth; c.height = innerHeight; });
+}
+resize();
+addEventListener('resize', resize);
+
+for (let i = 0; i < 3; i++) {
+  for (let j = 0; j < starCounts[i]; j++) {
+    starLayers[i].push({
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight,
+      r: Math.random() * starSizes[i] + 0.3,
+      a: Math.random() * 0.6 + 0.2,
+      tw: Math.random() * Math.PI * 2,
+      dx: (Math.random() - 0.5) * starSpeeds[i],
+      dy: (Math.random() - 0.5) * starSpeeds[i]
+    });
+  }
+}
+
+let t = 0;
+function draw() {
+  t += 0.016;
+  contexts.forEach((ctx, i) => {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const s of starLayers[i]) {
+      s.x += s.dx;
+      s.y += s.dy;
+      if (s.x < 0) s.x = innerWidth;
+      if (s.x > innerWidth) s.x = 0;
+      if (s.y < 0) s.y = innerHeight;
+      if (s.y > innerHeight) s.y = 0;
+      const twinkle = 0.7 + Math.sin(t * 1.5 + s.tw) * 0.3;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${i === 2 ? '255,255,255' : '180,210,255'},${s.a * twinkle})`;
+      ctx.fill();
+    }
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
 </body>
 </html>
