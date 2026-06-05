@@ -386,19 +386,29 @@ bash test-e2e.sh  # 21 checks
 
 ## Documentation
 
-Full docs in `docs/`:
-- [Whitepaper](docs/whitepaper.md)
-- [Tokenomics](docs/tokenomics.md) — Halving + elastic supply
-- [Proof of Useful Work](docs/pouw.md)
-- [Mining Guide](docs/mining.md) — Multi-backend, HiveOS, Docker
-- [Pool Guide](docs/pool.md)
-- [Anti-ASIC Measures](docs/anti-asic.md)
-- [Stratum Protocol](docs/stratum.md)
-- [API Reference](docs/api.md)
-- [Smart Contracts](docs/contracts.md) — Full contract spec
-- [Mainnet Features](docs/mainnet-features.md) — Halving, elastic, challenge, timelock
-- [Data Sources](docs/data-sources.md)
-- [FAQ](docs/faq.md)
+User-facing documentation lives on the **[GitHub wiki](https://github.com/thekillsquad007/voidmap/wiki)**.
+
+Source files (versioned with the repo) are in `wiki/`. To sync them to the GitHub wiki:
+
+```bash
+# One-time bootstrap: visit https://github.com/thekillsquad007/voidmap/wiki
+# and click "Create the first page" (any content, just title: Home).
+# Then re-run:
+./scripts/publish-wiki.sh
+```
+
+The wiki includes:
+- [How to Mine](https://github.com/thekillsquad007/voidmap/wiki/How-to-Mine) — step-by-step
+- [Whitepaper](https://github.com/thekillsquad007/voidmap/wiki/Whitepaper)
+- [Mainnet Features](https://github.com/thekillsquad007/voidmap/wiki/Mainnet-Features) — halving, elastic, challenge, timelock
+- [Tokenomics](https://github.com/thekillsquad007/voidmap/wiki/Tokenomics)
+- [Smart Contracts](https://github.com/thekillsquad007/voidmap/wiki/Smart-Contracts)
+- [Mining Guide](https://github.com/thekillsquad007/voidmap/wiki/Mining-Guide)
+- [AMD/ROCm Setup](https://github.com/thekillsquad007/voidmap/wiki/AMD-ROCm-Setup)
+- [FAQ](https://github.com/thekillsquad007/voidmap/wiki/Frequently-Asked-Questions)
+- See [the full sidebar](https://github.com/thekillsquad007/voidmap/wiki/_Sidebar) for everything
+
+Developer-facing docs (tied to specific code versions) remain in `docs/`.
 
 ## License
 
