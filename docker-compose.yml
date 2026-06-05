@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  voidmap-miner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: voidmap-miner:latest
+    container_name: voidmap-miner
+    # GPU access - use 'all' for NVIDIA, specific device for AMD
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # For AMD on HiveOS, use device_cgroup_rules instead:
+    # device_cgroup_rules:
+    #   - 'c 226:* rmw'  # /dev/kfd
+    #   - 'c 227:* rmw'  # /dev/dri/renderD*
+    # devices:
+    #   - /dev/kfd:/dev/kfd
+    #   - /dev/dri:/dev/dri
+    # environment:
+    #   - HSA_OVERRIDE_GFX_VERSION=10.3.0
+    #   - ROC_ENABLE_PRE_VEGA=1
+    volumes:
+      - voidmap-data:/root/.voidmap/data
+      - voidmap-results:/root/.voidmap/results
+      - voidmap-models:/root/.voidmap/models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - VOIDMAP_TASK=exoplanet
+      - VOIDMAP_ROUNDS=1
+      # Uncomment and set for on-chain submission:
+      # - VOIDMAP_SUBMIT=true
+      # - VOIDMAP_RPC_URL=https://sepolia.base.org
+      # - VOIDMAP_POOL_ADDRESS=0x3768e25aFc129D4455e267819801f2b2914fA4A2
+      # - VOIDMAP_PRIVATE_KEY=your_private_key_here
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # HiveOS AMD GPU variant
+  voidmap-miner-amd:
+    build:
+      context: .
+      dockerfile: Dockerfile.hiveos
+    image: voidmap-miner:hiveos
+    container_name: voidmap-miner-amd
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
+      - ROC_ENABLE_PRE_VEGA=1
+      - PYTHONUNBUFFERED=1
+      - VOIDMAP_TASK=exoplanet
+      - VOIDMAP_ROUNDS=1
+    volumes:
+      - voidmap-data:/root/.voidmap/data
+      - voidmap-results:/root/.voidmap/results
+      - voidmap-models:/root/.voidmap/models
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  voidmap-data:
+  voidmap-results:
+  voidmap-models:

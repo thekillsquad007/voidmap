@@ -1,0 +1,88 @@
+# Voidmap Miner - HiveOS Optimized Docker Image
+# Based on HiveOS Ubuntu 22.04 with ROCm pre-installed
+# Build: docker build -f Dockerfile.hiveos -t voidmap-miner:hiveos .
+
+# Use HiveOS base or Ubuntu 22.04 with ROCm
+FROM ubuntu:22.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python3-dev \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    curl \
+    ca-certificates \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
+    libnuma1 \
+    libpciaccess0 \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# ROCm is typically pre-installed on HiveOS at /opt/rocm
+# Add ROCm to PATH and LD_LIBRARY_PATH
+ENV PATH="/opt/rocm/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/opt/rocm/lib:/opt/rocm/lib64:${LD_LIBRARY_PATH}"
+ENV HSA_OVERRIDE_GFX_VERSION="10.3.0"
+
+# Python dependencies
+WORKDIR /app
+
+# Install PyTorch with ROCm support (for AMD GPUs on HiveOS)
+# Use the ROCm-specific index for best performance
+RUN pip3 install --no-cache-dir \
+    torch==2.5.1 \
+    torchvision==0.20.1 \
+    --index-url https://download.pytorch.org/whl/rocm6.2
+
+# Install ONNX Runtime with DirectML fallback
+RUN pip3 install --no-cache-dir onnxruntime onnx
+
+# Copy requirements and install
+COPY miner/requirements.txt /app/miner/requirements.txt
+RUN pip3 install --no-cache-dir -r /app/miner/requirements.txt
+
+# Copy miner source
+COPY miner/ /app/miner/
+
+# Pre-cache model weights
+RUN mkdir -p /root/.voidmap/models && \
+    python3 -c "
+from huggingface_hub import hf_hub_download
+try:
+    hf_hub_download('sarojpatil16/exoplanet-transit-detector', 'model.safetensors', cache_dir='/root/.voidmap/models')
+    print('Model cached successfully')
+except Exception as e:
+    print(f'Model cache warning: {e}')
+" 2>&1 || true
+
+# Create data directories
+RUN mkdir -p /root/.voidmap/data /root/.voidmap/results
+
+# Set PYTHONPATH
+ENV PYTHONPATH=/app/miner:$PYTHONPATH
+ENV HF_HOME=/root/.voidmap/models
+ENV TORCH_HOME=/root/.voidmap/models
+
+WORKDIR /app/miner
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD python3 voidmap_miner.py --detect 2>&1 | grep -q "Backend" || exit 1
+
+# Default: single exoplanet mining round
+ENTRYPOINT ["python3", "voidmap_miner.py"]
+CMD ["--task", "exoplanet", "--rounds", "1"]
