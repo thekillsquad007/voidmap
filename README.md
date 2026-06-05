@@ -1,54 +1,78 @@
 # Voidmap
 
-**Proof of Useful Work.** GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Earn VOID tokens for running scientific ML computation on real telescope data.
-
-## How It Works
+**Proof of Useful Work.** GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Earn VOID tokens for running scientific ML inference on real telescope data.
 
 ```
-Miner downloads real data → Runs pre-trained ML model → Uploads result to IPFS
-     ↓                                    ↓                        ↓
-  MAST/SDSS/ZTF              Transit/Galaxy/Anomaly        CID stored on-chain
-     ↓                                    ↓                        ↓
-  Real FITS files          Quality score (50-100)        Pool submits → VOID minted
+  Real telescope data              Real ML models                Real science
+       ↓                                ↓                            ↓
+   MAST TESS  ───→  GPU Inference  ───→  IPFS + on-chain  ───→  Exoplanets found
+   SDSS Galaxies       (AstroNet)         (verifiable)            Galaxies classified
+   ZTF Alerts          (Zoobot)                                  Anomalies flagged
 ```
 
-**Miners never touch the blockchain.** The pool operator handles all on-chain submissions. Miners just run GPU inference.
+## Why Voidmap
+
+| Problem | Voidmap Solution |
+|---------|------------------|
+| PoW wastes energy on useless hashes | Computation produces real scientific results |
+| Public archives hold petabytes of unanalyzed data | Miners process it, get paid in VOID |
+| GPUs are commoditized (NVIDIA/AMD) | Anti-ASIC design + elastic mint keeps mining fair |
+| Token founders can rug | Token is ownerless from day one, autonomous governance |
 
 ## Quick Start
+
+### Test (no wallet needed)
 
 ```bash
 cd miner
 pip install -r requirements.txt
-python voidmap-miner.py --detect          # verify GPU + dependencies
-python voidmap-miner.py --list-targets    # show known TESS targets
-python voidmap-miner.py --task exoplanet --rounds 10
-python voidmap-miner.py --list-results    # view your outputs
+python voidmap_miner.py --detect          # verify GPU + dependencies
+python voidmap_miner.py --task exoplanet --rounds 1
 ```
 
-### Requirements
+### Mine & Submit to Testnet (Base Sepolia)
 
-- Python 3.10+
-- NVIDIA GPU (CUDA) or Apple Silicon (MPS) or CPU (slow)
-- 4GB+ VRAM for ConvNeXT galaxy model
-
-### Dependencies
-
+```bash
+# Get free Sepolia ETH from https://www.alchemy.com/faucets/base-sepolia
+python voidmap_miner.py --task exoplanet --rounds 1 --submit \
+  --rpc-url https://sepolia.base.org \
+  --pool-address 0x3768e25aFc129D4455e267819801f2b2914fA4A2 \
+  --private-key 0xYOUR_PRIVATE_KEY
 ```
-torch>=2.0       numpy>=1.24       astropy>=5.0
-lightkurve>=2.4  huggingface_hub   safetensors>=0.4
-ipfshttpclient   Pillow>=9.0       requests>=2.28
-websockets>=11   scikit-learn>=1.2
+
+### HiveOS / Docker (AMD + NVIDIA)
+
+```bash
+# One-liner install
+bash <(curl -s https://raw.githubusercontent.com/thekillsquad007/voidmap/main/install_hiveos.sh)
+voidmap --task exoplanet --rounds 1000 --submit --private-key 0x... --rpc-url https://mainnet.base.org
+
+# Or Docker
+docker compose up -d voidmap-miner        # NVIDIA
+docker compose up -d voidmap-miner-amd    # AMD (Radeon, ROCm)
 ```
+
+## What Just Got Built (v1.0 Mainnet)
+
+The smart contracts are now production-ready with full autonomy:
+
+- **Ownerless from day one** — Token has no owner. No one can mint outside the MiningPool. No one can change params without a 7-day timelock.
+- **Bitcoin-style halving** — Block reward starts at 50 VOID, halves every 210,000 submissions. Floor at 0.1 VOID.
+- **Elastic supply** — Reward scales with network quality. High quality → 0.8x dampener (slow issuance). Low quality → 1.2x boost (attract more miners).
+- **Challenge/slash** — Any miner can challenge a submission within 6 hours. If quality is below floor, submitter loses 20% of reward. 50% to challenger, 50% burned.
+- **Time-locked governance** — Param changes require 7-day delay + proposer must stake 1% of miner supply.
+
+See `docs/mainnet-features.md` for the full specification.
 
 ## Mining Tasks
 
-| # | Task | Data Source | Model | Output |
-|---|------|-------------|-------|--------|
-| 1 | Exoplanet Transit Detection | MAST TESS SPOC 2-min | AstroNetCNN (244K params) | Planet/FP/No-signal + confidence |
-| 2 | Galaxy Morphology Classification | SDSS DR18 cutout API | GalaxyConvNeXT / Zoobot (15.6M params) | Spiral/Elliptical/Irregular/Merger + confidence |
-| 3 | Astronomical Anomaly Detection | ZTF alerts via Fink broker | Autoencoder | Anomaly score + flag |
+| # | Task | Data Source | Model | Output | Task ID |
+|---|------|-------------|-------|--------|---------|
+| 1 | Exoplanet Transit Detection | MAST TESS SPOC 2-min | AstroNetCNN (244K params, 89% acc) | Planet/FP/No-signal + confidence | 1 |
+| 2 | Galaxy Morphology Classification | SDSS DR18 cutout | GalaxyClassifier (Zoobot-ready) | Spiral/Elliptical/Irregular/Merger | 2 |
+| 3 | Astronomical Anomaly Detection | ZTF alerts via Fink | Autoencoder | Anomaly score + flag | 3 |
 
-All data is real. Miners download actual FITS files from MAST, galaxy images from SDSS, and alert streams from ZTF/Fink. No simulations.
+All data is **real**. Miners download actual FITS files from MAST, galaxy images from SDSS, and alert streams from ZTF/Fink. No simulations.
 
 ### Known TESS Targets
 
@@ -60,91 +84,149 @@ All data is real. Miners download actual FITS files from MAST, galaxy images fro
 | TIC 150428135 | TOI-1259 | A b |
 | TIC 441462736 | TOI-1444 | b |
 
-## Quality Scoring
+## Reward Formula
 
-| Range | Tier | Reward Multiplier |
-|-------|------|-------------------|
-| < 50 | Rejected | — (work not accepted) |
-| 50–69 | Accepted | 1x |
-| 70–89 | Good | 1.2x |
-| 90–100 | Excellent | 1.5x |
+```
+reward = blockReward × quality × qualityMultiplier × elasticMultiplier
+        ───────────────────────────────────────────────────────────
+                              10 × 100
+```
 
-Quality is derived from model confidence with a deterministic noise factor (from input/output hashes) to prevent gaming. A 12-second cooldown between submissions limits spam.
+Where:
+- `blockReward` = current halving-epoch reward (50 → 25 → 12.5 → ... VOID)
+- `quality` = 50–100 (with deterministic noise floor)
+- `qualityMultiplier` = 1.0x (base), 1.2x (good), 1.5x (excellent)
+- `elasticMultiplier` = 0.8x–1.2x based on 10-submission rolling average quality
 
-## Anti-ASIC Measures
+### Example: Excellent work in first halving epoch (no elasticity)
 
-Voidmap enforces GPU-only mining through five defense layers:
+```
+quality = 95, qualityMultiplier = 1.5, elasticMultiplier = 1.0, blockReward = 50
+reward = (50 × 95 × 15 × 100) / (10 × 100) = 712.5 VOID
+```
 
-1. **Architecture Rotation** — switches between CNN / Transformer / Mamba / ConvNeXT every 100 blocks
-2. **Weight Perturbation** — random noise added to model weights each rotation (can't pre-compute solutions)
-3. **Random Batch Sizes** — 16–128, can't optimize pipeline for fixed input
-4. **Memory-Hard Operations** — 512MB random-access data allocation, too large for ASIC SRAM
-5. **Cryptographic Seeds** — `os.urandom(32)` for weight seeds, not `time.time()` (which is pre-computable)
+### Quality Tiers
+
+| Range | Tier | Multiplier | Status |
+|-------|------|------------|--------|
+| < 50 | Rejected | — | Work not accepted, no reward |
+| 50–69 | Accepted | 1.0x | Base reward |
+| 70–89 | Good | 1.2x | Bonus |
+| 90–100 | Excellent | 1.5x | Maximum bonus |
+
+12-second cooldown per miner. Pool submissions deduct 2% fee.
+
+## Tokenomics
+
+| Allocation | Amount | Vesting | Recipient |
+|------------|--------|---------|-----------|
+| GPU Miners | 900M VOID (90%) | Halving schedule | Minted per submission via MiningPool |
+| Dev Fund | 50M VOID (5%) | 4 years | Dev address, claimable after vesting |
+| DAO/Treasury | 50M VOID (5%) | None | DAO address, unlocked at genesis |
+
+**Total supply**: 1B VOID (1,000,000,000). Fixed. No inflation.
+
+**Token is ownerless**: No one can mint outside the MiningPool. No one can change the protocol without a 7-day timelock + 1% proposer quorum.
+
+### Halving Schedule
+
+| Epoch | Subscriptions | Block Reward | Notes |
+|-------|--------------|--------------|-------|
+| 0 | 0 – 209,999 | 50 VOID | Genesis |
+| 1 | 210,000 – 419,999 | 25 VOID | First halving |
+| 2 | 420,000 – 629,999 | 12.5 VOID | Second halving |
+| 3 | 630,000 – 839,999 | 6.25 VOID | Third halving |
+| ... | ... | ... | Halve every 210K |
+| ∞ | After floor | 0.1 VOID | MIN_BLOCK_REWARD floor |
+
+Total mined at genesis rate (no halvings): ~21M VOID over 4,200,000 submissions. At a real-world rate of 100K submissions/day, that's ~42 days to first halving. Halvings slow issuance; elastic mint rewards quality.
+
+## Anti-ASIC Defense (5 Layers)
+
+1. **Real Data Pipeline** — HTTP downloads, variable FITS/JPEG sizes, Python preprocessing. Can't be synthesized to fixed hardware.
+2. **Dynamic ML Models** — PyTorch/ONNX with BatchNorm, Dropout, AdaptiveAvgPool. Variable input shapes.
+3. **Timing Attestation** — `MIN_COMPUTE_DURATION = 2 seconds` enforced both client and on-chain. Sub-2s results rejected.
+4. **Hardware Detection** — FPGA, emulated, virtual, software-renderer GPUs rejected at startup.
+5. **Architecture Rotation** — `anti_asic.py` rotates between CNN/Transformer/Mamba/ConvNeXT every 100 blocks. Weight perturbation prevents pre-computation.
 
 ## Architecture
 
 ```
 voidmap/
 ├── contracts/
-│   ├── VoidmapToken.sol     # ERC-20, 90% miner allocation, renounceable
-│   ├── MiningPool.sol       # Work submissions, quality scoring, pool support, reward minting
-│   ├── Voidmap.t.sol        # 31 forge tests
-│   └── foundry.toml
+│   ├── VoidmapToken.sol     # ERC-20, ownerless, halving-aware, 1-time minter migration
+│   ├── MiningPool.sol       # Tasks, pools, halving, elastic mint, challenge/slash, timelock
+│   └── Voidmap.t.sol        # 48 forge tests
 ├── miner/
-│   ├── voidmap-miner.py     # Solo miner (hyphenated name, direct run)
-│   ├── voidmap_miner.py     # Same (underscore, for Python imports)
+│   ├── voidmap_miner.py     # Multi-backend miner (PyTorch CUDA/ROCm/MPS + ONNX DirectML/CPU)
+│   ├── model_backend.py     # Backend auto-detection (CUDA → ROCm → DirectML → CPU)
 │   ├── anti_asic.py         # Architecture rotation, weight perturbation, memory-hard ops
-│   ├── stratum.py           # Stratum protocol messages
-│   ├── stratum_pool.py      # Stratum pool server (for pool operators)
-│   ├── pool.py              # WebSocket pool server (legacy)
-│   ├── pool_client.py       # Pool client (connects to pool, receives work, submits shares)
-│   ├── ipfs_upload.py       # Upload results to IPFS (Pinata fallback, sha256 content hash if offline)
-│   ├── results_api.py       # REST API for researchers to query results
+│   ├── stratum_pool.py      # Stratum protocol pool server
+│   ├── pool_client.py       # Pool client (bounded retry)
+│   ├── ipfs_upload.py       # IPFS upload (Pinata + sha256 fallback)
+│   ├── results_api.py       # REST API for researchers
 │   └── requirements.txt
 ├── web/
-│   └── index.html           # Dashboard (live data from API, wallet connect)
-├── docs/                    # GitBook documentation (11 pages)
-├── deploy.sh                # Deploy contracts to Base
-└── .github/workflows/
-    └── test-contracts.yml   # CI: forge build + forge test
+│   └── index.html           # Static dashboard with live stats, wallet connect
+├── docs/                    # GitBook (whitepaper, contracts, mining, etc.)
+├── deploy.sh                # Mainnet deploy to Base
+├── deploy-testnet.sh        # Testnet deploy to Base Sepolia
+├── Dockerfile               # CUDA + ONNX DirectML Docker image
+├── Dockerfile.hiveos        # ROCm-optimized for HiveOS
+├── docker-compose.yml       # One-command deploy (NVIDIA + AMD)
+├── install_hiveos.sh        # Native HiveOS install script
+└── test-e2e.sh              # 21 live testnet E2E checks
 ```
 
-## Contracts
+## Smart Contracts
 
-### VoidmapToken (ERC-20)
+### VoidmapToken (Ownerless ERC-20)
 
-- 1B max supply, 18 decimals
-- 900M VOID (90%) minted to miners via `mintMinerReward()`
-- 50M VOID (5%) minted to dev fund at deploy, 4-year vesting
-- 50M VOID (5%) minted to DAO/treasury at deploy (no vesting)
-- `renounce()` — permanently disables minting + renounces ownership
-- `devClaim(address to)` — dev transfers vested tokens after 4 years
+- **Fixed supply**: 1B VOID (1,000,000,000 × 10¹⁸)
+- **90% (900M)**: Minted to miners by MiningPool via `mintMinerReward()`
+- **5% (50M)**: Dev fund, 4-year vesting, claimable by dev address
+- **5% (50M)**: DAO/Treasury, unlocked at genesis
+- **No owner** — No `Ownable` inheritance. `minter` is set via one-time `migrateMinter()` then locked forever
+- **Burns**: `burnFromMiner()` allows the pool to burn VOID (challenge bonds, slash burns)
 
-### MiningPool
+### MiningPool (Autonomous)
 
-- Task management: `createTask()`, `deactivateTask()`
-- Solo mining: `submitWork()` — anyone can submit
-- Pool mining: `submitPoolWork()` — pool operator submits on behalf of members
-- Quality scoring with anti-gaming noise
-- 2% pool fee, withdrawable by operator via `withdrawPoolFees()`
-- 12-second submission cooldown per miner
-- Member share tracking with cleanup on `removePoolMember()`
+**Core features:**
+- `createTask(name, dataSource, modelSpec)` — Add new mining task (requires proposer quorum)
+- `deactivateTask(taskId)` — Disable a task
+- `submitWork(...)` — Solo miner submission
+- `submitPoolWork(...)` — Pool operator submits on behalf of members (2% fee)
 
-## Tokenomics
+**Halving:**
+- `HALVING_INTERVAL = 210,000` submissions
+- `INITIAL_BLOCK_REWARD = 50 VOID`, halve each epoch
+- `MIN_BLOCK_REWARD = 0.1 VOID` floor
+- `getHalvingEpoch()` / `getHalvingProgress()` / `getCurrentBlockReward()`
 
-| Allocation | Amount | Details |
-|------------|--------|---------|
-| GPU Miners | 900M VOID (90%) | Minted per submission, quality-based |
-| Dev Fund | 50M VOID (5%) | 4-year vesting, claimable after |
-| DAO/Treasury | 50M VOID (5%) | Minted at deploy, no vesting |
+**Elastic Mint:**
+- 10-submission rolling quality window
+- `TARGET_QUALITY = 75` (dead zone ±5)
+- `MIN_ELASTIC_MULTIPLIER = 0.8x`, `MAX_ELASTIC_MULTIPLIER = 1.2x`
+- `getAvgNetworkQuality()` / `getCurrentElasticMultiplier()`
 
-Reward formula: `1 VOID × quality × multiplier / 10`
+**Challenge/Slash:**
+- `CHALLENGE_WINDOW = 6 hours` to file a challenge
+- `CHALLENGE_BOND = 1 VOID` (burned on file, refunded to winner)
+- `CHALLENGE_RESOLUTION_DELAY = 1 hour` (allows re-execution)
+- `SLASH_BPS = 20%` of submitter's reward
+- `CHALLENGER_REWARD_BPS = 50%` of slash, 50% burned
+- `fileChallenge(submissionId)` / `resolveChallenge(challengeId)`
 
-- Base (50-69): 1x → 5–6.9 VOID
-- Good (70-89): 1.2x → 8.4–10.68 VOID
-- Excellent (90-100): 1.5x → 13.5–15 VOID
+**Time-Locked Governance:**
+- `TIMELOCK_DELAY = 7 days`
+- `PROPOSER_QUORUM_BPS = 1%` of total miner-minted
+- `stakeAsProposer(amount)` / `unstakeProposer(amount)`
+- `proposeTimelock(dataHash)` / `executeTimelock(id)` / `cancelTimelock(id)`
 
-Pool submissions: 2% fee deducted, accumulated for operator withdrawal.
+**Pool support:**
+- `createPool(name, feeRecipient)` — Anyone can create a pool
+- `addPoolMember()` / `removePoolMember()` — Operator manages members
+- `withdrawPoolFees()` — Operator withdraws accumulated 2% fees
 
 ## Deployment (Base L2)
 
@@ -152,20 +234,37 @@ Pool submissions: 2% fee deducted, accumulated for operator withdrawal.
 
 - [Foundry](https://book.getfoundry.sh) installed (`curl -L https://foundry.paradigm.xyz | bash`)
 - Deployer wallet with ETH on Base (~0.0001 ETH recommended)
-- RPC endpoint (public: `https://mainnet.base.org`)
+- RPC endpoint (public: `https://mainnet.base.org` or Alchemy/Infura)
 
-### Deploy
+### Deploy to Testnet
 
 ```bash
 export DEPLOYER_PK=0x...your_private_key...
-export DEV_ADDR=0x...your_dev_fund_address...
-export DAO_ADDR=0x...your_dao_treasury_address...  # optional, defaults to DEV_ADDR
-export RPC_URL=https://mainnet.base.org            # optional
+export DEV_ADDR=0x...your_dev_fund_address...   # defaults to deployer
+export DAO_ADDR=0x...your_dao_treasury...        # defaults to dev
+export RPC_URL=https://sepolia.base.org          # optional
+
+bash deploy-testnet.sh
+```
+
+This deploys both contracts in 2 steps:
+1. MiningPool (with placeholder token)
+2. VoidmapToken (with pool's address)
+3. `migrateMinter(pool)` to lock the minter
+4. Bootstrap proposer quorum with 1 VOID stake
+5. Create the 3 default tasks (Exoplanet, Galaxy, Anomaly)
+
+### Deploy to Mainnet
+
+```bash
+export DEPLOYER_PK=0x...your_mainnet_key...
+export DEV_ADDR=0x...your_multisig_or_cold_wallet...
+export RPC_URL=https://mainnet.base.org
 
 bash deploy.sh
 ```
 
-This deploys VoidmapToken, MiningPool, and transfers token ownership to the pool contract. Gas cost: ~3.15M gas (~0.00006 ETH at 19 Gwei).
+**After deploy, the token is ownerless.** Only the MiningPool can mint. Period.
 
 ### Verify on BaseScan
 
@@ -179,13 +278,6 @@ forge verify-contract <POOL_ADDRESS> MiningPool.sol:MiningPool \
 
 ## Pool Setup (for pool operators)
 
-### WebSocket Pool (legacy)
-
-```bash
-pip install websockets
-python pool.py  # starts on ws://0.0.0.0:8546
-```
-
 ### Stratum Pool (recommended)
 
 ```bash
@@ -194,9 +286,9 @@ python stratum_pool.py --port 3333
 ```
 
 Pool operators need:
-- RPC endpoint (`https://mainnet.base.org` or Alchemy/Infura)
-- Wallet with ETH for gas (to submit `submitWork`/`submitPoolWork` on-chain)
-- MiningPool contract address (from deployment)
+- MiningPool contract address
+- Wallet with ETH for gas (to submit on-chain)
+- RPC endpoint
 
 ### Pool Client (for miners connecting to a pool)
 
@@ -204,22 +296,18 @@ Pool operators need:
 python pool_client.py --pool ws://pool.example.com:8546 --miner-id my_rig_1
 ```
 
-Miners connecting to a pool do **not** need ETH or an RPC endpoint. The pool pays all gas.
+Miners connecting to a pool do **not** need ETH or an RPC. The pool handles on-chain submission.
 
-## IPFS Setup (for result storage)
+## IPFS Setup
 
-Results are uploaded to IPFS so researchers can access them. Options:
+Results are uploaded to IPFS for permanent storage:
 
-1. **Local IPFS daemon** — install [Kubo](https://docs.ipfs.tech/install/), run `ipfs daemon`
-2. **Pinata (free tier)** — 100 pins/month, set `PINATA_API_KEY` + `PINATA_API_SECRET`
-3. **Offline fallback** — results saved locally with `sha256:` content hash
+1. **Local IPFS daemon** — `ipfs daemon`
+2. **Pinata (free tier)** — Set `PINATA_API_KEY` + `PINATA_API_SECRET`
+3. **Offline fallback** — `sha256:<hash>` content hash (results saved locally)
 
 ```bash
-# With IPFS daemon running:
-pip install ipfshttpclient
-# Results auto-upload when you mine
-
-# With Pinata:
+# With Pinata
 export PINATA_API_KEY=...
 export PINATA_API_SECRET=...
 ```
@@ -234,62 +322,83 @@ python results_api.py --port 8547
 |----------|-------------|
 | `GET /` | API info |
 | `GET /results` | All results |
-| `GET /results?task=exoplanet&min_quality=80` | Filter by task, quality, miner, target |
+| `GET /results?task=exoplanet&min_quality=80` | Filtered results |
 | `GET /results/{id}` | Specific result |
 | `GET /results/{id}/ipfs` | Fetch from IPFS gateway |
 | `GET /stats` | Aggregate statistics |
 | `GET /targets` | Known TESS targets |
 | `GET /tasks` | Available mining tasks |
 
-### Query examples
+## Multi-Backend GPU Support
 
-```bash
-# Get high-quality exoplanet detections
-curl http://localhost:8547/results?task=exoplanet&min_quality=80
+| Backend | GPU Type | Install |
+|---------|----------|---------|
+| PyTorch CUDA | NVIDIA | `pip install torch` (default) |
+| PyTorch ROCm | AMD (Linux) | `pip install torch --index-url https://download.pytorch.org/whl/rocm6.2` |
+| ONNX DirectML | AMD/Intel/NVIDIA | `pip install onnxruntime-directml` |
+| ONNX CPU | Universal | `pip install onnxruntime` |
 
-# Get all results for a specific target
-curl http://localhost:8547/results?target=TOI-700
-
-# Fetch a result from IPFS gateway
-curl http://localhost:8547/results/result_exoplanet_1234567890/ipfs
-
-# Pool statistics
-curl http://localhost:8547/stats
-```
+The miner auto-selects the best available backend. No code changes needed.
 
 ## Website
 
 ```bash
-# Static, just open in browser
+# Static
 open web/index.html
-# Or serve it:
+
+# Or serve
 python -m http.server 8080 --directory web
 ```
 
-The dashboard shows network stats, active tasks, quality thresholds, the data pipeline, and researcher info. Live leaderboard/submissions populate from the Results API when the network is active. Includes MetaMask wallet connect.
+Dashboard includes:
+- Live network stats (supply, halving, miners, tasks)
+- Quality tier visualization
+- Pipeline walkthrough
+- Researcher info
+- Wallet connect
+- Recent submissions (from API when live)
 
 ## Testing
 
 ```bash
 cd contracts
-forge test --skip "lib/openzeppelin-contracts/fv" -vv   # 31 tests
-forge test --gas-report                                  # gas usage
-forge build --sizes                                      # contract sizes
+forge test -vv       # 48 tests
+forge test --gas-report  # gas usage
+forge build --sizes  # contract sizes
 ```
 
-## Data Sources (for researchers)
+```bash
+# End-to-end on live testnet
+bash test-e2e.sh  # 21 checks
+```
 
-All data comes from public, open-access archives:
+## Data Sources (Open Access)
 
-| Archive | API | Data |
+| Archive | URL | Data |
 |---------|-----|------|
 | MAST | portal.mast.stsci.edu | TESS SPOC 2-min light curves (FITS) |
-| SDSS DR18 | skyserver.sdss.org | Galaxy cutout images (JPEG/PNG) |
+| SDSS DR18 | skyserver.sdss.org | Galaxy cutout images (JPEG) |
 | ZTF/Fink | fink-portal.org | Alert streams (JSON) |
 | SIMBAD | simbad.cds.unistra.fr | Object metadata |
 | NED | ned.ipac.caltech.edu | Redshift, cross-ids |
 | VizieR | vizier.cds.unistra.fr | Published catalog data |
 | NASA ADS | ui.adsabs.harvard.edu | Literature references |
+
+## Documentation
+
+Full docs in `docs/`:
+- [Whitepaper](docs/whitepaper.md)
+- [Tokenomics](docs/tokenomics.md) — Halving + elastic supply
+- [Proof of Useful Work](docs/pouw.md)
+- [Mining Guide](docs/mining.md) — Multi-backend, HiveOS, Docker
+- [Pool Guide](docs/pool.md)
+- [Anti-ASIC Measures](docs/anti-asic.md)
+- [Stratum Protocol](docs/stratum.md)
+- [API Reference](docs/api.md)
+- [Smart Contracts](docs/contracts.md) — Full contract spec
+- [Mainnet Features](docs/mainnet-features.md) — Halving, elastic, challenge, timelock
+- [Data Sources](docs/data-sources.md)
+- [FAQ](docs/faq.md)
 
 ## License
 

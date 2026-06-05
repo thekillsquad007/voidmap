@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voidmap Explorer — Discoveries from the night sky</title>
+<meta name="description" content="Explore real exoplanet candidates, galaxy classifications, and anomaly detections computed by the Voidmap network.">
+<style>
+  :root {
+    --bg-deep: #06091a;
+    --bg-mid: #0d1230;
+    --bg-light: #1a2050;
+    --accent-magenta: #ff3eb5;
+    --accent-cyan: #4dd0e1;
+    --accent-yellow: #ffd54f;
+    --accent-green: #66bb6a;
+    --text-primary: #e8eaf6;
+    --text-dim: #9fa8da;
+    --text-faint: #5c6bc0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Starfield */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+      radial-gradient(1px 1px at 25% 5%, white, transparent),
+      radial-gradient(1px 1px at 50% 25%, white, transparent),
+      radial-gradient(1.5px 1.5px at 75% 15%, #ffd54f, transparent),
+      radial-gradient(1px 1px at 10% 50%, white, transparent),
+      radial-gradient(2px 2px at 90% 60%, #4dd0e1, transparent),
+      radial-gradient(1px 1px at 35% 80%, white, transparent),
+      radial-gradient(1px 1px at 65% 90%, white, transparent),
+      radial-gradient(1.5px 1.5px at 15% 95%, #ff3eb5, transparent),
+      radial-gradient(1px 1px at 85% 35%, white, transparent);
+    background-size: 200% 200%;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    z-index: -1;
+  }
+
+  header {
+    background: linear-gradient(180deg, rgba(13, 18, 48, 0.95) 0%, rgba(13, 18, 48, 0.7) 100%);
+    border-bottom: 1px solid rgba(255, 62, 181, 0.2);
+    padding: 24px 48px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5em;
+    font-weight: 800;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: radial-gradient(circle at 30% 30%, var(--accent-magenta), var(--accent-cyan));
+    border-radius: 50%;
+    box-shadow: 0 0 24px rgba(255, 62, 181, 0.5);
+  }
+
+  nav { display: flex; gap: 24px; }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.2s;
+  }
+
+  nav a:hover { color: var(--accent-cyan); }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .hero h1 {
+    font-size: 3em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-magenta) 0%, var(--accent-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .hero p {
+    color: var(--text-dim);
+    font-size: 1.2em;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 64px;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, rgba(26, 32, 80, 0.6) 0%, rgba(13, 18, 48, 0.6) 100%);
+    border: 1px solid rgba(77, 208, 225, 0.15);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(77, 208, 225, 0.15);
+  }
+
+  .stat-icon {
+    font-size: 2.5em;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 2.2em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-magenta) 0%, var(--accent-yellow) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .stat-label {
+    color: var(--text-dim);
+    font-size: 0.9em;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 48px 0 24px;
+  }
+
+  .section-header h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+  }
+
+  .section-header .badge {
+    background: rgba(102, 187, 106, 0.15);
+    color: var(--accent-green);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+
+  /* Discoveries */
+  .discoveries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .discovery-card {
+    background: linear-gradient(135deg, rgba(26, 32, 80, 0.7) 0%, rgba(13, 18, 48, 0.7) 100%);
+    border: 1px solid rgba(255, 213, 79, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .discovery-card::before {
+    content: "★";
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    color: var(--accent-yellow);
+    font-size: 1.4em;
+    text-shadow: 0 0 12px rgba(255, 213, 79, 0.5);
+  }
+
+  .discovery-card:hover {
+    border-color: var(--accent-yellow);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(255, 213, 79, 0.15);
+  }
+
+  .discovery-target {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: 4px;
+  }
+
+  .discovery-tic {
+    font-size: 0.85em;
+    color: var(--text-faint);
+    font-family: "SF Mono", monospace;
+    margin-bottom: 16px;
+  }
+
+  .discovery-prediction {
+    display: inline-block;
+    background: rgba(102, 187, 106, 0.2);
+    color: var(--accent-green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .discovery-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85em;
+    color: var(--text-dim);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(77, 208, 225, 0.15);
+  }
+
+  .tab {
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    padding: 12px 24px;
+    font-size: 1em;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text-primary); }
+
+  .tab.active {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Submissions Table */
+  .submissions-table {
+    background: linear-gradient(135deg, rgba(26, 32, 80, 0.6) 0%, rgba(13, 18, 48, 0.6) 100%);
+    border: 1px solid rgba(77, 208, 225, 0.15);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  th {
+    background: rgba(13, 18, 48, 0.5);
+    color: var(--text-dim);
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  tr:hover td {
+    background: rgba(77, 208, 225, 0.05);
+  }
+
+  .hash {
+    font-family: "SF Mono", monospace;
+    color: var(--text-faint);
+    font-size: 0.85em;
+  }
+
+  .hash a { color: var(--accent-cyan); text-decoration: none; }
+  .hash a:hover { text-decoration: underline; }
+
+  .quality-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .quality-pill.excellent { background: rgba(102, 187, 106, 0.2); color: var(--accent-green); }
+  .quality-pill.good { background: rgba(255, 213, 79, 0.2); color: var(--accent-yellow); }
+  .quality-pill.accepted { background: rgba(77, 208, 225, 0.2); color: var(--accent-cyan); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid rgba(255, 62, 181, 0.2);
+    padding: 32px 48px;
+    margin-top: 64px;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 0.9em;
+  }
+
+  footer a { color: var(--accent-cyan); text-decoration: none; }
+
+  @media (max-width: 768px) {
+    header, main, footer { padding-left: 24px; padding-right: 24px; }
+    .hero h1 { font-size: 2em; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <span>VOIDMAP EXPLORER</span>
+    </div>
+    <nav>
+      <a href="#discoveries">Discoveries</a>
+      <a href="#submissions">Submissions</a>
+      <a href="#miners">Miners</a>
+      <a href="#network">Network</a>
+      <a href="https://voidmap.org">Main Site</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Discoveries from the night sky</h1>
+    <p>Real astronomical findings, computed by a global network of GPU miners. Every result is permanently recorded on-chain.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">🪐</div>
+      <div class="stat-value" id="stat-planets">—</div>
+      <div class="stat-label">Exoplanet Candidates</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🌌</div>
+      <div class="stat-value" id="stat-galaxies">—</div>
+      <div class="stat-label">Galaxies Classified</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-value" id="stat-anomalies">—</div>
+      <div class="stat-label">Anomalies Detected</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-value" id="stat-samples">—</div>
+      <div class="stat-label">Data Points Processed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⛏️</div>
+      <div class="stat-value" id="stat-submissions">—</div>
+      <div class="stat-label">Total Submissions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value" id="stat-miners">—</div>
+      <div class="stat-label">Active Miners</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>🌟 Recent Discoveries</h2>
+    <span class="badge" id="discoveries-count">Live</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="exoplanet">Exoplanets</button>
+    <button class="tab" data-tab="galaxy">Galaxies</button>
+    <button class="tab" data-tab="anomaly">Anomalies</button>
+  </div>
+
+  <div class="tab-content active" data-tab="exoplanet">
+    <div class="discoveries-grid" id="exoplanet-grid">
+      <div class="discovery-card">
+        <div class="discovery-target">TOI-732</div>
+        <div class="discovery-tic">TIC 307210830 · MAST TESS</div>
+        <div class="discovery-prediction">🪐 PLANET CANDIDATE</div>
+        <div class="discovery-meta">
+          <span>Confidence: <strong>92.0%</strong></span>
+          <span>Quality: <strong>95/100</strong></span>
+        </div>
+        <div class="discovery-meta">
+          <span>Miner: <span class="hash">0xfdAD...a363</span></span>
+          <span>2 hours ago</span>
+        </div>
+      </div>
+
+      <div class="discovery-card">
+        <div class="discovery-target">TOI-700</div>
+        <div class="discovery-tic">TIC 36724087 · MAST TESS</div>
+        <div class="discovery-prediction">🪐 PLANET CANDIDATE</div>
+        <div class="discovery-meta">
+          <span>Confidence: <strong>88.5%</strong></span>
+          <span>Quality: <strong>91/100</strong></span>
+        </div>
+        <div class="discovery-meta">
+          <span>Miner: <span class="hash">0xabcd...1234</span></span>
+          <span>5 hours ago</span>
+        </div>
+      </div>
+
+      <div class="discovery-card">
+        <div class="discovery-target">TOI-1452</div>
+        <div class="discovery-tic">TIC 261136679 · MAST TESS</div>
+        <div class="discovery-prediction">🪐 PLANET CANDIDATE</div>
+        <div class="discovery-meta">
+          <span>Confidence: <strong>86.2%</strong></span>
+          <span>Quality: <strong>87/100</strong></span>
+        </div>
+        <div class="discovery-meta">
+          <span>Miner: <span class="hash">0x9876...5432</span></span>
+          <span>1 day ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" data-tab="galaxy">
+    <div class="discoveries-grid">
+      <div class="discovery-card">
+        <div class="discovery-target">NGC 4565</div>
+        <div class="discovery-tic">SDSS DR18 · Needle Galaxy</div>
+        <div class="discovery-prediction">🌌 SPIRAL EDGE-ON</div>
+        <div class="discovery-meta">
+          <span>Confidence: <strong>94.1%</strong></span>
+          <span>Quality: <strong>96/100</strong></span>
+        </div>
+        <div class="discovery-meta">
+          <span>Miner: <span class="hash">0x1111...2222</span></span>
+          <span>3 hours ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" data-tab="anomaly">
+    <div class="discoveries-grid">
+      <div class="discovery-card">
+        <div class="discovery-target">ZTF18abc...</div>
+        <div class="discovery-tic">ZTF Survey · 2026-06-04</div>
+        <div class="discovery-prediction">⚠️ HIGH ANOMALY SCORE</div>
+        <div class="discovery-meta">
+          <span>Score: <strong>0.92</strong></span>
+          <span>Quality: <strong>88/100</strong></span>
+        </div>
+        <div class="discovery-meta">
+          <span>Miner: <span class="hash">0x3333...4444</span></span>
+          <span>6 hours ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" id="submissions">
+    <h2>📋 Latest Submissions</h2>
+    <span class="badge">Live</span>
+  </div>
+
+  <div class="submissions-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Task</th>
+          <th>Target</th>
+          <th>Prediction</th>
+          <th>Quality</th>
+          <th>Miner</th>
+          <th>IPFS</th>
+          <th>When</th>
+        </tr>
+      </thead>
+      <tbody id="submissions-tbody">
+        <tr>
+          <td>#12,345</td>
+          <td>Exoplanet</td>
+          <td>TOI-732</td>
+          <td><span style="color: var(--accent-green);">PLANET</span> (92.0%)</td>
+          <td><span class="quality-pill excellent">95</span></td>
+          <td class="hash"><a href="#">0xfdAD...a363</a></td>
+          <td class="hash"><a href="https://ipfs.io/ipfs/QmXxx" target="_blank">QmXxx...</a></td>
+          <td>2 min ago</td>
+        </tr>
+        <tr>
+          <td>#12,344</td>
+          <td>Galaxy</td>
+          <td>NGC 4565</td>
+          <td><span style="color: var(--accent-cyan);">Spiral</span> (94.1%)</td>
+          <td><span class="quality-pill excellent">96</span></td>
+          <td class="hash"><a href="#">0x1111...2222</a></td>
+          <td class="hash"><a href="https://ipfs.io/ipfs/QmYyy" target="_blank">QmYyy...</a></td>
+          <td>5 min ago</td>
+        </tr>
+        <tr>
+          <td>#12,343</td>
+          <td>Exoplanet</td>
+          <td>TOI-1452</td>
+          <td><span style="color: var(--accent-green);">PLANET</span> (88.5%)</td>
+          <td><span class="quality-pill excellent">91</span></td>
+          <td class="hash"><a href="#">0xabcd...1234</a></td>
+          <td class="hash"><a href="https://ipfs.io/ipfs/QmZzz" target="_blank">QmZzz...</a></td>
+          <td>8 min ago</td>
+        </tr>
+        <tr>
+          <td>#12,342</td>
+          <td>Anomaly</td>
+          <td>ZTF18abc</td>
+          <td><span style="color: var(--accent-yellow);">score 0.87</span></td>
+          <td><span class="quality-pill good">84</span></td>
+          <td class="hash"><a href="#">0x3333...4444</a></td>
+          <td class="hash"><a href="https://ipfs.io/ipfs/QmAaa" target="_blank">QmAaa...</a></td>
+          <td>12 min ago</td>
+        </tr>
+        <tr>
+          <td>#12,341</td>
+          <td>Exoplanet</td>
+          <td>TOI-700</td>
+          <td><span style="color: var(--accent-yellow);">NO_SIGNAL</span> (60%)</td>
+          <td><span class="quality-pill accepted">57</span></td>
+          <td class="hash"><a href="#">0x5678...9012</a></td>
+          <td class="hash"><a href="https://ipfs.io/ipfs/QmBbb" target="_blank">QmBbb...</a></td>
+          <td>15 min ago</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-header" id="miners">
+    <h2>👥 Top Miners</h2>
+    <span class="badge">All-time</span>
+  </div>
+
+  <div class="submissions-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Miner</th>
+          <th>Submissions</th>
+          <th>Avg Quality</th>
+          <th>VOID Earned</th>
+          <th>Discoveries</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🥇 1</td>
+          <td class="hash"><a href="#">0xfdAD...a363</a></td>
+          <td>3,421</td>
+          <td><span class="quality-pill excellent">89</span></td>
+          <td>127,453 VOID</td>
+          <td>17 ⭐</td>
+        </tr>
+        <tr>
+          <td>🥈 2</td>
+          <td class="hash"><a href="#">0xabcd...1234</a></td>
+          <td>2,876</td>
+          <td><span class="quality-pill excellent">86</span></td>
+          <td>98,221 VOID</td>
+          <td>12 ⭐</td>
+        </tr>
+        <tr>
+          <td>🥉 3</td>
+          <td class="hash"><a href="#">0x1111...2222</a></td>
+          <td>2,103</td>
+          <td><span class="quality-pill good">82</span></td>
+          <td>71,089 VOID</td>
+          <td>8 ⭐</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td class="hash"><a href="#">0x3333...4444</a></td>
+          <td>1,567</td>
+          <td><span class="quality-pill good">78</span></td>
+          <td>48,902 VOID</td>
+          <td>5 ⭐</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-header" id="network">
+    <h2>🌐 Network</h2>
+    <span class="badge">Mainnet</span>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-value" id="stat-block">—</div>
+      <div class="stat-label">Block Height</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-value" id="stat-halving">—</div>
+      <div class="stat-label">Halving Epoch</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💎</div>
+      <div class="stat-value" id="stat-reward">—</div>
+      <div class="stat-label">Current Block Reward</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-value" id="stat-burned">—</div>
+      <div class="stat-label">Total Burned</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>Voidmap Explorer · Powered by <a href="https://voidmap.org">Voidmap</a> on <a href="https://base.org">Base</a></p>
+  <p style="margin-top: 8px;">All results permanently recorded on-chain. <a href="result-registry.html">View Result Registry →</a></p>
+</footer>
+
+<script>
+  // Mock data — in production, fetched from RPC
+  const MOCK = {
+    planets: 47,
+    galaxies: 1283,
+    anomalies: 23,
+    samples: "4.2M",
+    submissions: 12345,
+    miners: 87,
+    block: 12456789,
+    halving: 0,
+    reward: "50.0",
+    burned: "127K"
+  };
+
+  // Apply
+  for (const [id, val] of Object.entries(MOCK)) {
+    const el = document.getElementById('stat-' + id);
+    if (el) el.textContent = val;
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      document.querySelector(`.tab-content[data-tab="${target}"]`).classList.add('active');
+    });
+  });
+
+  // Smooth scroll
+  document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

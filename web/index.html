@@ -4,54 +4,84 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voidmap — Proof of Useful Work</title>
 <style>
-:root{--bg:#0a0a1a;--bg2:#12122a;--fg:#e0e0ff;--fg2:#6666aa;--accent:#7c5cfc;--accent2:#00d4aa;--red:#ff6b6b;--green:#51cf66}
+:root{
+  --bg:#0a0a1a;--bg2:#12122a;--bg3:#1a1a3a;--fg:#e0e0ff;--fg2:#6666aa;--fg3:#8888cc;
+  --accent:#7c5cfc;--accent2:#00d4aa;--red:#ff6b6b;--yellow:#ffd43b;--orange:#ff922b;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden;line-height:1.5}
 canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .content{position:relative;z-index:1}
 nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;position:fixed;top:0;width:100%;backdrop-filter:blur(20px);background:rgba(10,10,26,0.8);z-index:100;border-bottom:1px solid rgba(255,255,255,0.04)}
 nav .logo{font-size:1.25rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-nav a{color:var(--fg2);text-decoration:none;margin-left:1.5rem;font-size:0.9rem}
-nav a:hover{color:var(--fg)}
+nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.5rem;font-size:0.9rem;transition:color 0.2s}
+nav .nav-links a:hover{color:var(--fg)}
 .container{max-width:1200px;margin:0 auto;padding:6rem 2rem 2rem}
 
 .hero{text-align:center;padding:4rem 0 3rem}
-.hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.75rem}
-.hero p{opacity:0.6;max-width:600px;margin:0 auto 1.5rem;line-height:1.6}
-.tag{display:inline-block;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.3);color:var(--accent);padding:0.3rem 1rem;border-radius:20px;font-size:0.85rem;margin:0.25rem}
+.hero h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.75rem;line-height:1.1}
+.hero .tagline{font-size:clamp(1rem,2vw,1.25rem);opacity:0.7;max-width:680px;margin:0 auto 1.5rem}
+.tag{display:inline-block;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.3);color:var(--accent);padding:0.3rem 0.85rem;border-radius:20px;font-size:0.8rem;margin:0.2rem;font-weight:500}
+.tag.t2{background:rgba(0,212,170,0.15);border-color:rgba(0,212,170,0.3);color:var(--accent2)}
+.tag.t3{background:rgba(255,107,107,0.15);border-color:rgba(255,107,107,0.3);color:var(--red)}
 
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
-.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:1.25rem}
-.stat-card .l{color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em}
-.stat-card .v{font-size:1.5rem;font-weight:700;margin-top:0.25rem}
-.stat-card .s{font-size:0.75rem;margin-top:0.25rem;color:var(--fg2)}
+section{margin:3rem 0}
+h2{font-size:1.75rem;font-weight:700;margin-bottom:1rem;letter-spacing:-0.02em}
+h3{font-size:1.1rem;font-weight:700;margin-bottom:0.5rem}
+p{opacity:0.85;margin-bottom:0.5rem}
 
-.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-bottom:2rem}
-.task-card{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:1.5rem;position:relative;overflow:hidden}
-.task-card .num{position:absolute;top:1rem;right:1rem;font-size:2rem;font-weight:900;opacity:0.06}
-.task-card h3{font-size:1.1rem;margin-bottom:0.3rem}
-.task-card .desc{font-size:0.9rem;opacity:0.6;margin-bottom:0.75rem;line-height:1.4}
-.task-card .meta{font-size:0.8rem;color:var(--fg2);display:flex;gap:1rem;flex-wrap:wrap}
-.task-card .data-label{color:var(--accent2);font-size:0.75rem}
+.grid{display:grid;gap:1rem;margin-bottom:1rem}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
 
-h2{font-size:1.5rem;font-weight:700;margin:2rem 0 1rem}
-table{width:100%;border-collapse:collapse;font-size:0.9rem}
-th{text-align:left;padding:0.6rem 0.8rem;color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.04)}
+.card{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:1.25rem;transition:border-color 0.2s}
+.card:hover{border-color:rgba(124,92,252,0.3)}
+.card .l{color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
+.card .v{font-size:1.5rem;font-weight:800;margin-top:0.25rem;line-height:1.1}
+.card .s{font-size:0.75rem;margin-top:0.4rem;color:var(--fg2);line-height:1.4}
+.card .big-v{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+.task-card{position:relative;overflow:hidden}
+.task-card .num{position:absolute;top:1rem;right:1rem;font-size:2.5rem;font-weight:900;opacity:0.05;line-height:1}
+.task-card .desc{font-size:0.9rem;opacity:0.7;margin-bottom:0.75rem;line-height:1.5}
+.task-card .meta{font-size:0.8rem;color:var(--fg2);display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.4rem}
+.task-card .data-label{color:var(--accent2);font-size:0.7rem;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;display:block;margin-bottom:0.15rem}
+
+table{width:100%;border-collapse:collapse;font-size:0.9rem;margin:0.5rem 0}
+th{text-align:left;padding:0.6rem 0.8rem;color:var(--fg2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:600}
 td{padding:0.6rem 0.8rem;border-bottom:1px solid rgba(255,255,255,0.03);font-family:monospace}
 .hash{color:var(--accent2)}
 .addr{color:var(--accent)}
-.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:600}
+.badge{display:inline-block;padding:0.15rem 0.55rem;border-radius:5px;font-size:0.7rem;font-weight:600;letter-spacing:0.02em}
 .bg{background:rgba(0,212,170,0.2);color:var(--accent2)}
 .bb{background:rgba(124,92,252,0.2);color:var(--accent)}
+.br{background:rgba(255,107,107,0.2);color:var(--red)}
+.by{background:rgba(255,212,59,0.2);color:var(--yellow)}
+
+.btn{display:inline-block;padding:0.75rem 1.5rem;border-radius:10px;font-weight:600;text-decoration:none;margin:0.25rem;transition:transform 0.2s;font-size:0.9rem;cursor:pointer;border:none}
+.btn:hover{transform:translateY(-1px)}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-s{border:1px solid rgba(255,255,255,0.15);color:var(--fg);background:transparent}
 
 .cta{text-align:center;padding:4rem 0}
-.cta pre{background:rgba(0,0,0,0.3);padding:1.25rem;border-radius:12px;text-align:left;max-width:500px;margin:1.5rem auto;font-size:0.85rem}
+.cta pre{background:rgba(0,0,0,0.4);padding:1.25rem;border-radius:12px;text-align:left;max-width:600px;margin:1.5rem auto;font-size:0.8rem;line-height:1.5;overflow-x:auto;border:1px solid rgba(255,255,255,0.04)}
 .cta code{color:var(--accent2)}
-.btn{display:inline-block;padding:0.75rem 2rem;border-radius:10px;font-weight:600;text-decoration:none;margin:0.25rem}
-.btn-p{background:var(--accent);color:#fff}
-.btn-s{border:1px solid rgba(255,255,255,0.15);color:var(--fg)}
 
-footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.feature{background:var(--bg2);border:1px solid rgba(255,255,255,0.04);border-radius:14px;padding:1.5rem}
+.feature .icon{font-size:1.5rem;margin-bottom:0.5rem;display:block}
+
+.progress{background:rgba(255,255,255,0.05);border-radius:6px;height:8px;overflow:hidden;margin:0.5rem 0}
+.progress .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width 0.5s}
+
+footer{text-align:center;padding:3rem 2rem 2rem;opacity:0.4;font-size:0.8rem;border-top:1px solid rgba(255,255,255,0.04);margin-top:4rem}
+
+@media (max-width:768px){
+  nav .nav-links{display:none}
+  .container{padding:5rem 1rem 2rem}
+  .hero{padding:2rem 0}
+}
 </style>
 </head>
 <body>
@@ -59,141 +89,403 @@ footer{text-align:center;padding:2rem;opacity:0.3;font-size:0.8rem}
 <div class="content">
 <nav>
 <div class="logo">◆ VOIDMAP</div>
-<div><a href="#">Network</a><a href="#tasks">Tasks</a><a href="#miners">Miners</a><a href="#docs">Docs</a></div>
+<div class="nav-links">
+<a href="#network">Network</a>
+<a href="#tasks">Tasks</a>
+<a href="#mechanics">Mechanics</a>
+<a href="#mining">Mining</a>
+<a href="#docs">Docs</a>
+</div>
 </nav>
 <div class="container">
 
+<!-- HERO -->
 <div class="hero">
 <h1>Proof of Useful Work</h1>
-<p>GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Every computation contributes to scientific knowledge.</p>
-<div class="tags">
-<span class="tag">TESS Exoplanets</span>
-<span class="tag">SDSS Galaxies</span>
-<span class="tag">ZTF Anomalies</span>
-<span class="tag">90% to Miners</span>
-<span class="tag">Open Data</span>
+<p class="tagline">GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Every computation contributes to scientific knowledge. No founder, no owner, no promises — just code.</p>
+<div>
+<span class="tag">◆ TESS Exoplanets</span>
+<span class="tag t2">◆ SDSS Galaxies</span>
+<span class="tag t3">◆ ZTF Anomalies</span>
+<span class="tag">◆ Ownerless Token</span>
+<span class="tag t2">◆ Halving Schedule</span>
+<span class="tag t3">◆ Anti-ASIC</span>
+<span class="tag">◆ 90% to Miners</span>
+<span class="tag t2">◆ Open Data</span>
 </div>
 </div>
 
-<div class="stats">
-<div class="stat-card"><div class="l">VOID Supply</div><div class="v">1B</div><div class="s">90% to miners · 5% dev · 5% dao</div></div>
-<div class="stat-card"><div class="l">Mining Tasks</div><div class="v">3</div><div class="s">Exoplanet · Galaxy · Anomaly</div></div>
-<div class="stat-card"><div class="l">Data Sources</div><div class="v">Real</div><div class="s">MAST · SDSS DR18 · ZTF/Fink</div></div>
-<div class="stat-card"><div class="l">Models</div><div class="v">Pre-trained</div><div class="s">AstroNet · Zoobot · Autoencoder</div></div>
+<!-- NETWORK STATS -->
+<section id="network">
+<h2>Network at a Glance</h2>
+<div class="grid grid-4">
+<div class="card"><div class="l">Total Supply</div><div class="big-v">1B VOID</div><div class="s">90% miners · 5% dev · 5% DAO</div></div>
+<div class="card"><div class="l">Halving</div><div class="big-v">210K</div><div class="s">subs per halving · starts at 50 VOID</div></div>
+<div class="card"><div class="l">Active Tasks</div><div class="v">3</div><div class="s">Exoplanet · Galaxy · Anomaly</div></div>
+<div class="card"><div class="l">Owner</div><div class="v" style="color:var(--accent2)">None</div><div class="s">Token is ownerless from day one</div></div>
+<div class="card"><div class="l">Min Compute</div><div class="v">2s</div><div class="s">Anti-ASIC: faster = rejected on-chain</div></div>
+<div class="card"><div class="l">Pool Fee</div><div class="v">2%</div><div class="s">Operators can deduct, solo mining is 0%</div></div>
+<div class="card"><div class="l">Cooldown</div><div class="v">12s</div><div class="s">Per miner between submissions</div></div>
+<div class="card"><div class="l">Data Sources</div><div class="v">Real</div><div class="s">MAST · SDSS · ZTF/Fink</div></div>
 </div>
+</section>
 
-<h2 id="tasks">Active Mining Tasks</h2>
-<div class="tasks">
-<div class="task-card">
+<!-- HALVING PROGRESS (placeholder values, would query contract) -->
+<section>
+<h2>Halving Progress</h2>
+<div class="card" style="background:linear-gradient(135deg,rgba(124,92,252,0.05),rgba(0,212,170,0.05))">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+<div>
+<div class="l">Current Epoch</div>
+<div class="v" style="font-size:2rem">Epoch 0</div>
+</div>
+<div style="text-align:right">
+<div class="l">Block Reward</div>
+<div class="v" style="font-size:2rem;color:var(--accent2)">50 VOID</div>
+</div>
+<div style="text-align:right">
+<div class="l">Next Halving</div>
+<div class="v" style="font-size:1.2rem">210,000 subs</div>
+</div>
+</div>
+<div class="progress"><div class="bar" style="width:0%"></div></div>
+<div class="s">Halvings every 210,000 submissions. Reward halves each epoch. Floor at 0.1 VOID. See <a href="#docs" style="color:var(--accent2)">tokenomics</a>.</div>
+</div>
+</section>
+
+<!-- MINING TASKS -->
+<section id="tasks">
+<h2>Active Mining Tasks</h2>
+<div class="grid grid-3">
+<div class="card task-card">
 <div class="num">1</div>
+<div class="data-label">Task ID</div>
 <h3>Exoplanet Transit Detection</h3>
-<p class="desc">Download real TESS light curves from MAST, run pre-trained AstroNet CNN (244K params, 89% accuracy). Outputs: planet/false-positive/no-signal classification with confidence scores.</p>
+<p class="desc">Download real TESS light curves from MAST, run pre-trained AstroNet CNN (244K params, 89% test accuracy). Classify transit candidates with confidence scores.</p>
 <div class="meta"><span class="data-label">Data</span> MAST TESS SPOC 2-min cadence</div>
 <div class="meta"><span class="data-label">Model</span> AstroNetCNN (HuggingFace)</div>
-<div class="meta"><span class="data-label">Output</span> Transit candidates + probabilities</div>
+<div class="meta"><span class="data-label">Output</span> PLANET / FALSE_POSITIVE / NO_SIGNAL</div>
+<div class="meta"><span class="data-label">Targets</span> TOI-732, TOI-1452, TOI-700, TOI-1259, TOI-1444</div>
 </div>
 
-<div class="task-card">
+<div class="card task-card">
 <div class="num">2</div>
+<div class="data-label">Task ID</div>
 <h3>Galaxy Morphology Classification</h3>
-<p class="desc">Download real SDSS DR18 galaxy images, classify morphology (spiral/elliptical/irregular/merger). Results include classification confidence and probability distribution.</p>
+<p class="desc">Download real SDSS DR18 galaxy cutouts, classify morphology with confidence. Spiral, Elliptical, Irregular, Merger, Unknown.</p>
 <div class="meta"><span class="data-label">Data</span> SDSS DR18 cutout API</div>
 <div class="meta"><span class="data-label">Model</span> GalaxyClassifier (Zoobot-ready)</div>
-<div class="meta"><span class="data-label">Output</span> Morphology class + confidence</div>
+<div class="meta"><span class="data-label">Output</span> 5-class probabilities</div>
+<div class="meta"><span class="data-label">Targets</span> NGC 4565, M81, NGC 4889, NGC 4725, NGC 4921</div>
 </div>
 
-<div class="task-card">
+<div class="card task-card">
 <div class="num">3</div>
+<div class="data-label">Task ID</div>
 <h3>Astronomical Anomaly Detection</h3>
-<p class="desc">Download real ZTF alerts from Fink broker, detect anomalies using autoencoder. Flags unusual transients — supernovae, tidal disruption events, gravitational lenses.</p>
-<div class="meta"><span class="data-label">Data</span> ZTF via Fink broker API</div>
+<p class="desc">Download real ZTF alert streams from Fink broker, run autoencoder for anomaly scoring. Flags supernovae, tidal disruption events, gravitational lenses.</p>
+<div class="meta"><span class="data-label">Data</span> ZTF via Fink broker</div>
 <div class="meta"><span class="data-label">Model</span> AnomalyDetector (autoencoder)</div>
 <div class="meta"><span class="data-label">Output</span> Anomaly scores + flags</div>
+<div class="meta"><span class="data-label">Alerts</span> Real-time from ZTF survey</div>
 </div>
 </div>
+</section>
 
-<h2 id="quality">Data Quality & Thresholds</h2>
-<div class="stats">
-<div class="stat-card" style="border-color:var(--red)"><div class="l">Rejected</div><div class="v" style="color:var(--red)">&lt; 50</div><div class="s">Noise — work not accepted</div></div>
-<div class="stat-card" style="border-color:var(--fg2)"><div class="l">Accepted</div><div class="v">50-69</div><div class="s">Base reward — 1x multiplier</div></div>
-<div class="stat-card" style="border-color:var(--accent)"><div class="l">Good Work</div><div class="v" style="color:var(--accent)">70-89</div><div class="s">1.2x bonus reward</div></div>
-<div class="stat-card" style="border-color:var(--accent2)"><div class="l">Excellent</div><div class="v" style="color:var(--accent2)">90-100</div><div class="s">1.5x bonus reward</div></div>
+<!-- CORE MECHANICS -->
+<section id="mechanics">
+<h2>Core Mechanics</h2>
+<div class="feature-grid">
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Halving</h3>
+<p>Block reward starts at 50 VOID and halves every 210,000 submissions (Bitcoin-style). Floor at 0.1 VOID. Predictable, transparent supply.</p>
 </div>
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Elastic Mint</h3>
+<p>Reward scales with network quality. Target quality = 75. High quality → 0.8x dampener (slow issuance). Low quality → 1.2x boost (attract more miners).</p>
+</div>
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Challenge / Slash</h3>
+<p>Any miner can challenge a submission within 6 hours. If quality is below floor, submitter loses 20% of reward. 50% to challenger, 50% burned.</p>
+</div>
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Time-Locked Governance</h3>
+<p>Param changes require 7-day delay + proposer must stake 1% of total miner-minted supply. No rug, no admin keys, no emergency switch.</p>
+</div>
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Anti-ASIC</h3>
+<p>5 layers: real data pipeline, dynamic ML models, 2s compute attestation, FPGA detection, architecture rotation. ASICs and emulated GPUs rejected.</p>
+</div>
+<div class="feature">
+<span class="icon">◆</span>
+<h3>Pool Support</h3>
+<p>Anyone can run a pool. 2% fee deducted from pool submissions. Members tracked by share. Operator can withdraw accumulated fees anytime.</p>
+</div>
+</div>
+</section>
 
-<h2 id="pipeline">Data Pipeline</h2>
-<div class="tasks">
-<div class="task-card">
-<h3>1. Download Real Data</h3>
-<p class="desc">Miners download actual FITS files from MAST, cutout images from SDSS, and alert streams from ZTF/Fink. No simulations — real telescope observations.</p>
-<div class="meta"><span class="data-label">APIs</span> MAST Portal · SDSS SkyServer · Fink REST</div>
+<!-- QUALITY TIERS -->
+<section>
+<h2>Quality Tiers &amp; Multipliers</h2>
+<div class="grid grid-4">
+<div class="card" style="border-color:rgba(255,107,107,0.3)">
+<div class="l" style="color:var(--red)">Rejected</div>
+<div class="v" style="color:var(--red)">&lt; 50</div>
+<div class="s">Work not accepted. No reward. Try again.</div>
 </div>
-<div class="task-card">
-<h3>2. Process on GPU</h3>
-<p class="desc">Pre-trained models (AstroNet, Zoobot) run inference on real data. Outputs: transit candidates, galaxy classifications, anomaly flags with confidence scores.</p>
-<div class="meta"><span class="data-label">Models</span> HuggingFace pre-trained weights</div>
+<div class="card">
+<div class="l">Accepted</div>
+<div class="v">50 – 69</div>
+<div class="s">Base reward. 1.0x quality multiplier.</div>
 </div>
-<div class="task-card">
-<h3>3. Store on IPFS</h3>
-<p class="desc">Results uploaded to IPFS (free via Pinata). CID stored on-chain. Anyone can access via https://ipfs.io/ipfs/{CID}</p>
-<div class="meta"><span class="data-label">Storage</span> IPFS · On-chain CID</div>
+<div class="card" style="border-color:rgba(124,92,252,0.3)">
+<div class="l" style="color:var(--accent)">Good</div>
+<div class="v" style="color:var(--accent)">70 – 89</div>
+<div class="s">1.2x bonus. Quality noise from input/output hashes.</div>
 </div>
-<div class="task-card">
-<h3>4. Verify Your Work</h3>
-<p class="desc">Miner saves all results locally (~/.voidmap/results/). View exactly what you computed: target name, prediction, confidence, data source.</p>
-<div class="meta"><span class="data-label">Command</span> --list-results</div>
+<div class="card" style="border-color:rgba(0,212,170,0.3)">
+<div class="l" style="color:var(--accent2)">Excellent</div>
+<div class="v" style="color:var(--accent2)">90 – 100</div>
+<div class="s">1.5x bonus. Top-tier scientific contributions.</div>
 </div>
 </div>
+<p style="margin-top:1rem;font-size:0.85rem;opacity:0.6">Quality is derived from model confidence with a deterministic noise factor (0-9, derived from input/output/timestamp hashes) to prevent gaming. A 12-second cooldown per miner limits spam.</p>
+</section>
 
-<h2 id="researchers">For Researchers</h2>
-<div class="tasks">
-<div class="task-card">
-<h3>Access Results</h3>
-<p class="desc">All miner outputs are stored on IPFS and indexed on-chain. Query by TIC ID, coordinates, or task type. Results include: predictions, confidence scores, data hashes.</p>
-<div class="meta"><span class="data-label">Format</span> JSON with predictions + metadata</div>
+<!-- REWARD FORMULA -->
+<section>
+<h2>Reward Formula</h2>
+<div class="card" style="background:rgba(0,0,0,0.3)">
+<pre style="color:var(--accent2);font-size:0.9rem;line-height:1.7;margin:0">reward = <span style="color:var(--accent)">blockReward</span> × <span style="color:var(--yellow)">quality</span> × <span style="color:var(--orange)">qualityMultiplier</span> × <span style="color:var(--accent2)">elasticMultiplier</span>
+        ─────────────────────────────────────────────────────────────────────
+                              10 × 100</pre>
 </div>
-<div class="task-card">
-<h3>Integrate with Your Pipeline</h3>
-<p class="desc">Results are standard JSON with well-defined fields. Use with Astropy, astroML, or your own analysis scripts. Contribute models via HuggingFace.</p>
-<div class="meta"><span class="data-label">Tools</span> Astropy · lightkurve · PyTorch</div>
+<div class="grid grid-3" style="margin-top:1rem">
+<div class="card">
+<div class="l">blockReward</div>
+<div class="v">50 → 0.1</div>
+<div class="s">Halving-epoch reward. 50 VOID at genesis, floor at 0.1 VOID.</div>
+</div>
+<div class="card">
+<div class="l">quality × qualityMultiplier</div>
+<div class="v">50 – 150</div>
+<div class="s">Effective score after multiplier. Excellent (95) × 1.5 = 142.5.</div>
+</div>
+<div class="card">
+<div class="l">elasticMultiplier</div>
+<div class="v">0.8 – 1.2</div>
+<div class="s">Network quality adjustment. ±20% based on 10-sub rolling avg.</div>
 </div>
 </div>
+</section>
 
-  <h2 id="miners">Miner Leaderboard</h2>
-  <div class="stat-card" style="text-align:center;padding:2rem">
-    <div class="l">Leaderboard</div>
-    <p style="margin:1rem 0;opacity:0.6">Connect to the Voidmap network to see live stats.</p>
-    <p style="font-size:0.8rem;opacity:0.4">Data will populate from the Results API once the network is live.</p>
-    <div style="margin-top:1rem"><a class="btn btn-p" id="connectBtn" style="cursor:pointer">Connect Wallet</a></div>
-  </div>
+<!-- PIPELINE -->
+<section>
+<h2>Data Pipeline</h2>
+<div class="grid grid-4">
+<div class="card">
+<div class="l" style="color:var(--accent)">Step 1</div>
+<h3>Download</h3>
+<p class="s" style="opacity:0.8">Real FITS files from MAST, cutout images from SDSS, alert streams from ZTF/Fink. No simulations.</p>
+</div>
+<div class="card">
+<div class="l" style="color:var(--accent)">Step 2</div>
+<h3>Process on GPU</h3>
+<p class="s" style="opacity:0.8">Pre-trained models (AstroNet, Zoobot, Autoencoder) run inference. Outputs: predictions + confidence scores.</p>
+</div>
+<div class="card">
+<div class="l" style="color:var(--accent)">Step 3</div>
+<h3>Store on IPFS</h3>
+<p class="s" style="opacity:0.8">Results uploaded to IPFS (Pinata or local daemon). CID stored on-chain. Fallback: <code style="color:var(--accent2)">sha256:&lt;hash&gt;</code></p>
+</div>
+<div class="card">
+<div class="l" style="color:var(--accent)">Step 4</div>
+<h3>Submit On-Chain</h3>
+<p class="s" style="opacity:0.8">Pool operator submits <code style="color:var(--accent2)">submitWork()</code>. VOID minted to miner. 2s min compute enforced.</p>
+</div>
+</div>
+</section>
 
-  <h2>Recent Submissions</h2>
-  <div class="stat-card" style="text-align:center;padding:2rem">
-    <div class="l">Submissions</div>
-    <p style="margin:1rem 0;opacity:0.6">Submissions will appear here once miners are active on the network.</p>
-    <p style="font-size:0.8rem;opacity:0.4">Query the <code style="color:var(--accent2)">/api/v1/submissions</code> endpoint for live data.</p>
-  </div>
-
-<div class="cta" id="docs">
+<!-- MINING GETTING STARTED -->
+<section id="mining">
 <h2>Start Mining</h2>
-<pre>pip install torch lightkurve astropy huggingface_hub safetensors
-python voidmap-miner.py --detect
-python voidmap-miner.py --task exoplanet --rounds 10
-python voidmap-miner.py --list-targets
-python voidmap-miner.py --list-results</pre>
-<p style="margin:1rem 0;font-size:0.9rem;opacity:0.7">Downloads real TESS data from MAST, runs pre-trained AstroNet model, saves results to ~/.voidmap/results/</p>
-<div><a href="https://github.com/thekillsquad007/voidmap" class="btn btn-p" target="_blank">GitHub</a><a class="btn btn-s">Contracts</a></div>
+<div class="grid grid-2">
+<div class="card">
+<h3>Test Mode (no wallet)</h3>
+<div class="cta" style="text-align:left;padding:0">
+<pre style="font-size:0.8rem"><code>cd miner
+pip install -r requirements.txt
+python voidmap_miner.py --detect
+python voidmap_miner.py --task exoplanet --rounds 1</code></pre>
+</div>
+</div>
+<div class="card">
+<h3>Submit to Testnet (Base Sepolia)</h3>
+<div class="cta" style="text-align:left;padding:0">
+<pre style="font-size:0.8rem"><code>python voidmap_miner.py --task exoplanet --rounds 1 --submit \
+  --rpc-url https://sepolia.base.org \
+  --pool-address 0x3768e25aFc129D4455e267819801f2b2914fA4A2 \
+  --private-key 0xYOUR_KEY</code></pre>
+</div>
+</div>
+<div class="card">
+<h3>HiveOS / Docker (AMD + NVIDIA)</h3>
+<div class="cta" style="text-align:left;padding:0">
+<pre style="font-size:0.8rem"><code>bash &lt;(curl -s https://raw.githubusercontent.com/\
+thekillsquad007/voidmap/main/install_hiveos.sh)
+voidmap --task exoplanet --rounds 1000 --submit \
+  --private-key 0x... --rpc-url https://mainnet.base.org
+
+# Or Docker
+docker compose up -d voidmap-miner-amd</code></pre>
+</div>
+</div>
+<div class="card">
+<h3>Supported GPUs</h3>
+<p style="opacity:0.8;font-size:0.9rem">Auto-detected, in priority order:</p>
+<ul style="font-size:0.85rem;opacity:0.85;margin-left:1.2rem;margin-top:0.5rem">
+<li><span class="badge bb">CUDA</span> NVIDIA (PyTorch)</li>
+<li><span class="badge br">ROCm</span> AMD on Linux (PyTorch)</li>
+<li><span class="badge by">DirectML</span> AMD/Intel/NVIDIA (ONNX)</li>
+<li><span class="badge bg">CPU</span> Universal fallback</li>
+</ul>
+<p style="margin-top:1rem;font-size:0.8rem;opacity:0.6">FPGA, emulated, virtual, software-renderer GPUs rejected at startup.</p>
+</div>
+</div>
+</section>
+
+<!-- ANTI-ASIC -->
+<section>
+<h2>Anti-ASIC Defense (5 Layers)</h2>
+<div class="feature-grid">
+<div class="feature">
+<h3>1. Real Data Pipeline</h3>
+<p>HTTP downloads, variable FITS/JPEG sizes, Python preprocessing. Can't synthesize to fixed hardware.</p>
+</div>
+<div class="feature">
+<h3>2. Dynamic ML Models</h3>
+<p>PyTorch / ONNX with BatchNorm, Dropout, AdaptiveAvgPool. Variable input shapes. Architecture rotation.</p>
+</div>
+<div class="feature">
+<h3>3. Timing Attestation</h3>
+<p><code style="color:var(--accent2)">MIN_COMPUTE_DURATION = 2s</code> enforced both client and on-chain. Sub-2s results rejected.</p>
+</div>
+<div class="feature">
+<h3>4. Hardware Detection</h3>
+<p>FPGA, emulated, virtual, software-renderer GPUs rejected. Only consumer GPUs pass.</p>
+</div>
+<div class="feature">
+<h3>5. Architecture Rotation</h3>
+<p><code style="color:var(--accent2)">anti_asic.py</code> rotates CNN/Transformer/Mamba/ConvNeXT every 100 blocks. Weight perturbation.</p>
+</div>
+</div>
+</section>
+
+<!-- CONTRACTS -->
+<section id="docs">
+<h2>Smart Contracts</h2>
+<div class="grid grid-2">
+<div class="card">
+<h3>VoidmapToken (Ownerless ERC-20)</h3>
+<ul style="font-size:0.9rem;opacity:0.85;margin-left:1.2rem;line-height:1.8">
+<li>1B fixed supply (18 decimals)</li>
+<li>900M (90%) minted to miners via <code style="color:var(--accent2)">mintMinerReward()</code></li>
+<li>50M (5%) dev fund, 4-year vesting</li>
+<li>50M (5%) DAO/treasury, unlocked at genesis</li>
+<li>No <code style="color:var(--accent2)">Ownable</code> — minter locked after one-time migration</li>
+<li><code style="color:var(--accent2)">burnFromMiner()</code> for challenge bonds + slash burns</li>
+</ul>
+</div>
+<div class="card">
+<h3>MiningPool (Autonomous)</h3>
+<ul style="font-size:0.9rem;opacity:0.85;margin-left:1.2rem;line-height:1.8">
+<li><strong>Halving</strong> — 50 VOID → 25 → 12.5 → ... → 0.1 floor</li>
+<li><strong>Elastic Mint</strong> — 0.8x–1.2x based on 10-sub quality avg</li>
+<li><strong>Challenge/Slash</strong> — 6h window, 1 VOID bond, 20% slash</li>
+<li><strong>Time-Lock</strong> — 7-day delay, 1% proposer quorum</li>
+<li><strong>Pool Support</strong> — 2% fee, member shares, fee withdrawal</li>
+<li><strong>Tasks</strong> — 3 default at deploy, proposers can add more</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- DEPLOY -->
+<section>
+<h2>Deploy</h2>
+<div class="card" style="background:rgba(0,0,0,0.3)">
+<pre style="color:var(--fg);font-size:0.85rem;line-height:1.6;margin:0"><code><span style="color:var(--fg2)"># 1. Install Foundry</span>
+curl -L https://foundry.paradigm.xyz | bash
+
+<span style="color:var(--fg2)"># 2. Set env</span>
+export DEPLOYER_PK=0x...your_key...
+export DEV_ADDR=0x...your_multisig...
+export RPC_URL=https://mainnet.base.org
+
+<span style="color:var(--fg2)"># 3. Deploy (2-step, 7 minutes)</span>
+bash deploy.sh
+
+<span style="color:var(--fg2)"># 4. Verify on BaseScan</span>
+forge verify-contract &lt;TOKEN&gt; VoidmapToken.sol:VoidmapToken \
+  --verifier blockscout --verifier-url https://api.basescan.org/api</code></pre>
+</div>
+</section>
+
+<!-- FOR RESEARCHERS -->
+<section>
+<h2>For Researchers</h2>
+<div class="grid grid-2">
+<div class="card">
+<h3>Access Results</h3>
+<p>All miner outputs are stored on IPFS and indexed on-chain. Query by TIC ID, coordinates, task type, quality threshold.</p>
+<p style="margin-top:0.5rem;font-size:0.85rem;opacity:0.7"><code style="color:var(--accent2)">python results_api.py --port 8547</code></p>
+</div>
+<div class="card">
+<h3>Endpoints</h3>
+<ul style="font-size:0.85rem;opacity:0.85;margin-left:1.2rem;line-height:1.7">
+<li><code style="color:var(--accent2)">GET /results</code> — All results</li>
+<li><code style="color:var(--accent2)">GET /results?task=exoplanet&min_quality=80</code></li>
+<li><code style="color:var(--accent2)">GET /results/{id}/ipfs</code> — Fetch from gateway</li>
+<li><code style="color:var(--accent2)">GET /stats</code> — Aggregate stats</li>
+<li><code style="color:var(--accent2)">GET /targets</code> — Known TESS targets</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- CTAs -->
+<div class="cta">
+<h2>Get Started</h2>
+<p style="opacity:0.7;max-width:500px;margin:0 auto 1rem">Real computation. Real science. Real rewards.</p>
+<a href="https://github.com/thekillsquad007/voidmap" class="btn btn-p" target="_blank">GitHub Repo</a>
+<a href="docs/" class="btn btn-s">Documentation</a>
+<a href="docs/mainnet-features.md" class="btn btn-s">Mainnet Spec</a>
+<div style="margin-top:2rem;font-size:0.8rem;opacity:0.5">Built by an open community. No company. No CEO. No roadmap.</div>
 </div>
 
-<footer>◆ Voidmap — Real computation. Real science. Real rewards.</footer>
+<footer>
+◆ Voidmap — Real computation. Real science. Real rewards.<br>
+Built with PyTorch, ONNX Runtime, HuggingFace, Foundry, and public data from NASA/ESA/NSF.<br>
+<a href="https://github.com/thekillsquad007/voidmap" style="color:var(--accent2)">github.com/thekillsquad007/voidmap</a>
+</footer>
+
 </div>
 
-  <script>
-  const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
-  function r(){canvas.width=innerWidth;canvas.height=innerHeight}r();addEventListener('resize',r);
-  for(let i=0;i<300;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2});
-  function d(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const t of stars){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=canvas.width;if(t.x>canvas.width)t.x=0;if(t.y<0)t.y=canvas.height;if(t.y>canvas.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
-  document.getElementById('connectBtn')?.addEventListener('click',async()=>{
-    if(typeof window.ethereum!=='undefined'){try{const a=await window.ethereum.request({method:'eth_requestAccounts'});document.getElementById('connectBtn').textContent=a[0].slice(0,6)+'..'+a[0].slice(-4)}catch(e){document.getElementById('connectBtn').textContent='Rejected'}}else{document.getElementById('connectBtn').textContent='No Wallet'}});
-  </script>
+<script>
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+function r(){canvas.width=innerWidth;canvas.height=innerHeight}r();addEventListener('resize',r);
+for(let i=0;i<300;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,a:Math.random()*0.8+0.2,dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2});
+function d(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const t of stars){t.x+=t.dx;t.y+=t.dy;if(t.x<0)t.x=canvas.width;if(t.x>canvas.width)t.x=0;if(t.y<0)t.y=canvas.height;if(t.y>canvas.height)t.y=0;ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${t.a})`;ctx.fill()}requestAnimationFrame(d)}d();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})});
+});
+</script>
 </body>
 </html>
