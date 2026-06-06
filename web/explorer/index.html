@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>◇</text></svg>">
 <title>Voidmap Explorer — Mission Telemetry</title>
 <meta name="description" content="Explore real exoplanet candidates, galaxy classifications, and anomaly detections computed by the Voidmap network.">
@@ -11,638 +11,285 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#03050d;--bg2:#070b1c;--bg3:#0d1428;--bg4:#131c38;
-  --fg:#e8ecf5;--fg2:#8b9bb8;--fg3:#5d6b86;--fg4:#3a4459;
-  --cyan:#4dd6ff;--cyan-dim:rgba(77,214,255,0.15);
-  --amber:#ffc857;--amber-dim:rgba(255,200,87,0.15);
-  --violet:#a78bfa;
-  --red:#ff5c5c;--red-dim:rgba(255,92,92,0.15);
-  --green:#5ee89e;--green-dim:rgba(94,232,158,0.15);
-  --grad-cyan:linear-gradient(135deg,#4dd6ff 0%,#a78bfa 100%);
-  --grad-amber:linear-gradient(135deg,#ffc857 0%,#ff5c5c 100%);
-  --grad-nebula:radial-gradient(ellipse at 30% 20%,rgba(77,214,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(167,139,250,0.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 90%,rgba(255,200,87,0.04) 0%,transparent 40%);
+--bg:#060818;--bg2:#0c0f24;--bg3:#121638;--fg:#e4e8f4;--fg2:#9aa3c0;--fg3:#5c6480;
+--cyan:#4dd6ff;--cyan2:rgba(77,214,255,.12);--amber:#ffc857;--amber2:rgba(255,200,87,.12);
+--violet:#a78bfa;--violet2:rgba(167,139,250,.12);--red:#ff5c5c;--red2:rgba(255,92,92,.12);
+--green:#5ee89e;--green2:rgba(94,232,158,.12);
 }
-*{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--fg);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
-  line-height:1.55;overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
 body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:var(--grad-nebula);
+content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+background:
+radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.6),transparent),
+radial-gradient(1px 1px at 25% 45%,rgba(180,210,255,.5),transparent),
+radial-gradient(1.5px 1.5px at 40% 15%,rgba(255,255,255,.7),transparent),
+radial-gradient(1px 1px at 55% 70%,rgba(180,210,255,.4),transparent),
+radial-gradient(1px 1px at 70% 30%,rgba(255,255,255,.5),transparent),
+radial-gradient(1.5px 1.5px at 85% 60%,rgba(180,210,255,.6),transparent),
+radial-gradient(1px 1px at 15% 80%,rgba(255,255,255,.4),transparent),
+radial-gradient(1px 1px at 90% 10%,rgba(180,210,255,.5),transparent),
+radial-gradient(ellipse at 25% 15%,rgba(77,214,255,.06),transparent 50%),
+radial-gradient(ellipse at 75% 70%,rgba(167,139,250,.04),transparent 50%);
 }
-canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .wrap{position:relative;z-index:1}
 
 nav{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:0.85rem 2rem;position:fixed;top:0;width:100%;
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  background:rgba(3,5,13,0.75);
-  z-index:100;
-  border-bottom:1px solid rgba(77,214,255,0.08);
-  font-size:0.85rem;
+position:sticky;top:0;z-index:100;
+display:flex;justify-content:space-between;align-items:center;
+padding:.75rem 2rem;
+background:rgba(6,8,24,.85);backdrop-filter:blur(16px);
+border-bottom:1px solid rgba(77,214,255,.08);
+font-size:.85rem;
 }
-nav .logo{
-  font-weight:800;font-size:1.05rem;letter-spacing:0.05em;
-  background:var(--grad-cyan);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-decoration:none;
-}
-nav .logo::before{content:'◇ ';opacity:0.8;-webkit-text-fill-color:var(--cyan)}
-nav .telemetry{
-  display:flex;align-items:center;gap:1rem;
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
-  color:var(--fg2);text-transform:uppercase;letter-spacing:0.08em;
-}
-nav .telemetry .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease-in-out infinite}
-nav .telemetry .sep{color:var(--fg4)}
-nav .telemetry .label{color:var(--fg3)}
-nav .telemetry .val{color:var(--cyan)}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
-nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.25rem;font-weight:500;transition:color 0.2s}
+nav .logo{font-weight:800;font-size:1rem;letter-spacing:.06em;color:var(--cyan);text-decoration:none}
+nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.2rem;font-weight:500;transition:color .2s}
 nav .nav-links a:hover{color:var(--cyan)}
 
-main{max-width:1400px;margin:0 auto;padding:3.5rem 2rem 3rem;position:relative}
-.mission-id{
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;
-  text-transform:uppercase;color:var(--cyan);margin-bottom:0.5rem;
-  display:flex;align-items:center;gap:0.5rem;
-}
-.mission-id .line{width:24px;height:1px;background:var(--cyan)}
-h1{font-size:clamp(2rem,4.5vw,3rem);font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.5rem}
-h1 .grad{background:var(--grad-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:1rem;color:var(--fg2);max-width:680px;margin-bottom:2.5rem}
-h2{font-size:1.4rem;font-weight:800;letter-spacing:-0.01em}
-h2 .label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--cyan);display:block;margin-bottom:0.25rem;font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:2rem 2rem 3rem}
+.mid{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:.5rem}
+h1{font-size:clamp(2rem,4.5vw,3rem);font-weight:900;letter-spacing:-.02em;line-height:1.1;margin-bottom:.4rem}
+h1 .g1{color:var(--cyan)}
+.hero-sub{font-size:1rem;color:var(--fg2);max-width:640px;margin-bottom:2rem}
+h2{font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+h2 .label{font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);display:block;margin-bottom:.2rem;font-weight:600}
 
-.section-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin:3rem 0 1.25rem;
-}
-.badge{
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
-  padding:0.25rem 0.7rem;border-radius:3px;
-  text-transform:uppercase;letter-spacing:0.1em;font-weight:600;
-  background:var(--green-dim);color:var(--green);
-  border:1px solid rgba(94,232,158,0.2);
-}
-.badge.mainnet{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(77,214,255,0.2)}
-.badge.live{background:var(--green-dim);color:var(--green);border-color:rgba(94,232,158,0.2)}
-.badge.live::before{content:'●';margin-right:0.4rem;animation:pulse 2s infinite}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin:2.5rem 0 1rem}
+.badge{font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:.2rem .6rem;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.badge.live{background:var(--green2);color:var(--green);border:1px solid rgba(94,232,158,.2)}
+.badge.live::before{content:'●';margin-right:.35rem;animation:pulse 2s infinite}
+.badge.mainnet{background:var(--cyan2);color:var(--cyan);border:1px solid rgba(77,214,255,.2)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-/* STATS GRID */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin-bottom:2rem}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem;margin-bottom:2rem}
 .stat-card{
-  background:rgba(7,11,28,0.5);border:1px solid rgba(77,214,255,0.1);
-  border-radius:8px;padding:1.25rem;text-align:left;
-  transition:all 0.2s;position:relative;overflow:hidden;
-  backdrop-filter:blur(8px);
+background:rgba(12,15,36,.5);border:1px solid rgba(77,214,255,.1);
+border-radius:8px;padding:1rem;text-align:left;
+transition:all .2s;position:relative;overflow:hidden;
+backdrop-filter:blur(8px);
 }
-.stat-card:hover{border-color:rgba(77,214,255,0.3);background:rgba(13,20,40,0.6)}
-.stat-card::after{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:var(--grad-cyan);opacity:0.4;
-}
-.stat-icon{
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  border:1px solid rgba(77,214,255,0.2);border-radius:6px;
-  font-size:1rem;margin-bottom:0.6rem;
-  background:rgba(77,214,255,0.04);
-}
-.stat-value{
-  font-family:'JetBrains Mono',monospace;
-  font-size:1.65rem;font-weight:800;line-height:1;
-  background:var(--grad-cyan);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  letter-spacing:-0.02em;
-}
-.stat-label{
-  color:var(--fg2);font-size:0.7rem;margin-top:0.4rem;
-  text-transform:uppercase;letter-spacing:0.1em;
-  font-family:'JetBrains Mono',monospace;
-}
+.stat-card:hover{border-color:rgba(77,214,255,.25)}
+.stat-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--cyan),var(--violet));opacity:.4}
+.stat-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(77,214,255,.2);border-radius:5px;font-size:.9rem;margin-bottom:.5rem;background:rgba(77,214,255,.04)}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:800;line-height:1;color:var(--cyan);letter-spacing:-.02em}
+.stat-label{color:var(--fg2);font-size:.65rem;margin-top:.3rem;text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
 
 /* TABS */
-.tabs{
-  display:flex;gap:0;margin-bottom:1.5rem;
-  border-bottom:1px solid rgba(77,214,255,0.08);
-  overflow-x:auto;
-}
-.tab{
-  background:transparent;color:var(--fg2);
-  border:none;padding:0.85rem 1.5rem;
-  font-size:0.85rem;font-weight:600;cursor:pointer;
-  border-bottom:2px solid transparent;
-  transition:all 0.2s;font-family:inherit;
-  text-transform:uppercase;letter-spacing:0.08em;
-  white-space:nowrap;
-}
+.tabs{display:flex;gap:0;margin-bottom:1.25rem;border-bottom:1px solid rgba(77,214,255,.08);overflow-x:auto}
+.tab{background:transparent;color:var(--fg2);border:none;padding:.75rem 1.25rem;font-size:.82rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:inherit;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
 .tab:hover{color:var(--fg)}
 .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.tab .num{
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
-  color:var(--fg3);margin-left:0.4rem;
-}
+.tab .num{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--fg3);margin-left:.35rem}
 .tab.active .num{color:var(--cyan)}
 .tab-content{display:none}
 .tab-content.active{display:block}
 
-/* DISCOVERY CARDS */
-.discoveries-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0.75rem}
-.discovery-card{
-  background:rgba(7,11,28,0.5);border:1px solid rgba(77,214,255,0.1);
-  border-radius:8px;padding:1.25rem;
-  transition:all 0.2s;position:relative;
-  backdrop-filter:blur(8px);
+/* DISCOVERIES */
+.disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.7rem}
+.disc-card{
+background:rgba(12,15,36,.5);border:1px solid rgba(77,214,255,.1);
+border-radius:8px;padding:1.15rem;transition:all .2s;position:relative;
+backdrop-filter:blur(8px);
 }
-.discovery-card:hover{border-color:rgba(255,200,87,0.3);background:rgba(13,20,40,0.6)}
-.discovery-card::before{
-  content:'★';position:absolute;top:0.85rem;right:1rem;
-  color:var(--amber);font-size:1rem;
-  text-shadow:0 0 8px rgba(255,200,87,0.5);
-}
-.discovery-target{
-  font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:700;
-  color:var(--cyan);margin-bottom:0.15rem;letter-spacing:-0.01em;
-}
-.discovery-tic{
-  font-size:0.7rem;color:var(--fg3);
-  font-family:'JetBrains Mono',monospace;margin-bottom:0.85rem;
-  text-transform:uppercase;letter-spacing:0.05em;
-}
-.discovery-prediction{
-  display:inline-block;
-  background:var(--green-dim);color:var(--green);
-  padding:0.25rem 0.7rem;border-radius:3px;
-  font-size:0.7rem;font-weight:700;letter-spacing:0.05em;
-  text-transform:uppercase;border:1px solid rgba(94,232,158,0.2);
-  margin-bottom:0.85rem;font-family:'JetBrains Mono',monospace;
-}
-.discovery-prediction.spiral{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(77,214,255,0.2)}
-.discovery-prediction.anomaly{background:var(--amber-dim);color:var(--amber);border-color:rgba(255,200,87,0.2)}
-.discovery-meta{
-  display:flex;justify-content:space-between;
-  font-size:0.75rem;color:var(--fg2);
-  padding-top:0.6rem;margin-top:0.4rem;
-  border-top:1px solid rgba(77,214,255,0.06);
-  font-family:'JetBrains Mono',monospace;
-}
-.discovery-meta strong{color:var(--fg);font-weight:600}
-.discovery-meta + .discovery-meta{padding-top:0.4rem;margin-top:0;border-top:none}
+.disc-card:hover{border-color:rgba(255,200,87,.3)}
+.disc-card::before{content:'★';position:absolute;top:.75rem;right:.85rem;color:var(--amber);font-size:.9rem;text-shadow:0 0 6px rgba(255,200,87,.5)}
+.disc-target{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--cyan);margin-bottom:.1rem;letter-spacing:-.01em}
+.disc-tic{font-size:.65rem;color:var(--fg3);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.disc-pred{display:inline-block;padding:.2rem .6rem;border-radius:3px;font-size:.65rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.7rem;font-family:'JetBrains Mono',monospace;background:var(--green2);color:var(--green);border:1px solid rgba(94,232,158,.2)}
+.disc-pred.spiral{background:var(--cyan2);color:var(--cyan);border-color:rgba(77,214,255,.2)}
+.disc-pred.anomaly{background:var(--amber2);color:var(--amber);border-color:rgba(255,200,87,.2)}
+.disc-meta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--fg2);padding-top:.5rem;margin-top:.35rem;border-top:1px solid rgba(77,214,255,.06);font-family:'JetBrains Mono',monospace}
+.disc-meta strong{color:var(--fg);font-weight:600}
 
 /* TABLES */
-.submissions-table{
-  background:rgba(7,11,28,0.5);border:1px solid rgba(77,214,255,0.1);
-  border-radius:8px;overflow:hidden;backdrop-filter:blur(8px);
-  overflow-x:auto;
-}
-table{width:100%;border-collapse:collapse;font-size:0.85rem}
-th,td{padding:0.85rem 1.1rem;text-align:left;border-bottom:1px solid rgba(77,214,255,0.04)}
-th{
-  background:rgba(13,20,40,0.6);color:var(--fg2);
-  font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;
-  font-weight:600;font-family:'JetBrains Mono',monospace;
-  border-bottom:1px solid rgba(77,214,255,0.1);
-}
-td{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--fg)}
-tr:hover td{background:rgba(77,214,255,0.04)}
-.hash{color:var(--fg3);font-size:0.78rem}
+.stbl{background:rgba(12,15,36,.5);border:1px solid rgba(77,214,255,.1);border-radius:8px;overflow:hidden;backdrop-filter:blur(8px);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:.75rem 1rem;text-align:left;border-bottom:1px solid rgba(77,214,255,.04)}
+th{background:rgba(18,22,56,.6);color:var(--fg2);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-family:'JetBrains Mono',monospace;border-bottom:1px solid rgba(77,214,255,.1)}
+td{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--fg)}
+tr:hover td{background:rgba(77,214,255,.03)}
+.hash{color:var(--fg3);font-size:.75rem}
 .hash a{color:var(--cyan);text-decoration:none}
-.hash a:hover{text-decoration:underline}
-.quality-pill{
-  display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;
-  font-size:0.75rem;font-weight:700;font-family:'JetBrains Mono',monospace;
-}
-.quality-pill.excellent{background:var(--green-dim);color:var(--green);border:1px solid rgba(94,232,158,0.2)}
-.quality-pill.good{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(255,200,87,0.2)}
-.quality-pill.accepted{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(77,214,255,0.2)}
-.rank-medal{font-size:0.95rem;margin-right:0.25rem}
+.qpill{display:inline-block;padding:.12rem .45rem;border-radius:3px;font-size:.72rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.qpill.excellent{background:var(--green2);color:var(--green);border:1px solid rgba(94,232,158,.2)}
+.qpill.good{background:var(--amber2);color:var(--amber);border:1px solid rgba(255,200,87,.2)}
+.qpill.accepted{background:var(--cyan2);color:var(--cyan);border:1px solid rgba(77,214,255,.2)}
 
-footer{
-  text-align:center;padding:3rem 2rem 2.5rem;
-  border-top:1px solid rgba(77,214,255,0.08);margin-top:4rem;
-  font-size:0.8rem;color:var(--fg3);
-}
-footer p{margin-bottom:0.4rem;color:var(--fg3);font-size:0.85rem}
-footer a{color:var(--fg2);text-decoration:none;border-bottom:1px dotted var(--fg4);transition:all 0.2s}
+footer{text-align:center;padding:2rem 2rem;border-top:1px solid rgba(77,214,255,.08);margin-top:3rem;font-size:.78rem;color:var(--fg3)}
+footer p{margin-bottom:.3rem;color:var(--fg3);font-size:.82rem}
+footer a{color:var(--fg2);text-decoration:none;border-bottom:1px dotted var(--fg3);transition:color .2s}
 footer a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 
-@media (max-width:980px){
-  nav .telemetry{display:none}
-  main{padding:3rem 1.25rem 2rem}
-}
-@media (max-width:768px){
-  nav .nav-links a{margin-left:0.75rem;font-size:0.8rem}
-  .stat-value{font-size:1.35rem}
-  table{font-size:0.75rem}
-  th,td{padding:0.65rem 0.7rem}
+@media(max-width:768px){
+nav .nav-links{display:none}
+main{padding:1.5rem 1rem}
+.stat-value{font-size:1.2rem}
+table{font-size:.72rem}
+th,td{padding:.5rem .6rem}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-<canvas id="stars"></canvas>
-<canvas id="stars2"></canvas>
-<canvas id="stars3"></canvas>
 
 <nav>
-  <a class="logo" href="index.html">VOIDMAP&nbsp;EXPLORER</a>
-  <div class="telemetry">
-    <span><span class="dot"></span></span>
-    <span><span class="label">Block</span>&nbsp;<span class="val" id="nav-block">—</span></span>
-    <span class="sep">/</span>
-    <span><span class="label">Epoch</span>&nbsp;<span class="val">0</span></span>
-    <span class="sep">/</span>
-    <span><span class="label">Net</span>&nbsp;<span class="val">Base</span></span>
-  </div>
-  <div class="nav-links">
-    <a href="#discoveries">Discoveries</a>
-    <a href="#submissions">Submissions</a>
-    <a href="#miners">Miners</a>
-    <a href="#network">Network</a>
-    <a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Wiki</a>
-  </div>
+<a class="logo" href="index.html">◇ EXPLORER</a>
+<div class="nav-links">
+<a href="index.html">Home</a>
+<a href="howto.html">How to Mine</a>
+<a href="explorer/">Explorer</a>
+<a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Wiki</a>
+</div>
 </nav>
 
 <main>
-  <div class="mission-id"><span class="line"></span>Mission&nbsp;Telemetry · Live Network</div>
-  <h1>Discoveries from the <span class="grad">night sky</span></h1>
-  <p class="hero-sub">Real astronomical findings computed by a global network of GPU miners. Every result is permanently recorded on-chain via the <a href="https://github.com/thekillsquad007/voidmap/wiki/Result-Registry" target="_blank" style="color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(77,214,255,0.3)">Result Registry</a>.</p>
+<div class="mid">Mission Telemetry · Live Network</div>
+<h1>Discoveries from the <span class="g1">night sky</span></h1>
+<p class="hero-sub">Real astronomical findings computed by a global network of GPU miners. Every result is permanently recorded on-chain via the <a href="https://github.com/thekillsquad007/voidmap/wiki/Result-Registry" target="_blank" style="color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(77,214,255,.3)">Result Registry</a>.</p>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">◉</div>
-      <div class="stat-value" id="stat-planets">—</div>
-      <div class="stat-label">Exoplanet Candidates</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">◎</div>
-      <div class="stat-value" id="stat-galaxies">—</div>
-      <div class="stat-label">Galaxies Classified</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">△</div>
-      <div class="stat-value" id="stat-anomalies">—</div>
-      <div class="stat-label">Anomalies Detected</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">▦</div>
-      <div class="stat-value" id="stat-samples">—</div>
-      <div class="stat-label">Data Points Processed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">◇</div>
-      <div class="stat-value" id="stat-submissions">—</div>
-      <div class="stat-label">Total Submissions</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">◈</div>
-      <div class="stat-value" id="stat-miners">—</div>
-      <div class="stat-label">Active Miners</div>
-    </div>
-  </div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">◉</div><div class="stat-value" id="stat-planets">—</div><div class="stat-label">Exoplanet Candidates</div></div>
+<div class="stat-card"><div class="stat-icon">◎</div><div class="stat-value" id="stat-galaxies">—</div><div class="stat-label">Galaxies Classified</div></div>
+<div class="stat-card"><div class="stat-icon">△</div><div class="stat-value" id="stat-anomalies">—</div><div class="stat-label">Anomalies Detected</div></div>
+<div class="stat-card"><div class="stat-icon">▦</div><div class="stat-value" id="stat-samples">—</div><div class="stat-label">Data Points Processed</div></div>
+<div class="stat-card"><div class="stat-icon">◇</div><div class="stat-value" id="stat-submissions">—</div><div class="stat-label">Total Submissions</div></div>
+<div class="stat-card"><div class="stat-icon">◈</div><div class="stat-value" id="stat-miners">—</div><div class="stat-label">Active Miners</div></div>
+</div>
 
-  <div class="section-header" id="discoveries">
-    <h2><span class="label">Mission Log</span>Recent Discoveries</h2>
-    <span class="badge live">Live</span>
-  </div>
+<div class="section-header" id="discoveries">
+<h2><span class="label">Mission Log</span>Recent Discoveries</h2>
+<span class="badge live">Live</span>
+</div>
 
-  <div class="tabs">
-    <button class="tab active" data-tab="exoplanet">Exoplanets<span class="num" id="tab-count-exoplanet">3</span></button>
-    <button class="tab" data-tab="galaxy">Galaxies<span class="num">1</span></button>
-    <button class="tab" data-tab="anomaly">Anomalies<span class="num">1</span></button>
-  </div>
+<div class="tabs">
+<button class="tab active" data-tab="exoplanet">Exoplanets<span class="num" id="tab-count-exoplanet">3</span></button>
+<button class="tab" data-tab="galaxy">Galaxies<span class="num">1</span></button>
+<button class="tab" data-tab="anomaly">Anomalies<span class="num">1</span></button>
+</div>
 
-  <div class="tab-content active" data-tab="exoplanet">
-    <div class="discoveries-grid" id="exoplanet-grid">
-      <div class="discovery-card">
-        <div class="discovery-target">TOI-732</div>
-        <div class="discovery-tic">TIC 307210830 · MAST TESS S04</div>
-        <div class="discovery-prediction">▲ Planet Candidate</div>
-        <div class="discovery-meta"><span>Confidence</span><strong>92.0%</strong></div>
-        <div class="discovery-meta"><span>Quality</span><strong>95 / 100</strong></div>
-        <div class="discovery-meta"><span>Miner</span><span class="hash">0xfdAD...a363</span></div>
-        <div class="discovery-meta"><span>Period</span><strong>0.768 d</strong></div>
-      </div>
+<div class="tab-content active" data-tab="exoplanet">
+<div class="disc-grid" id="exoplanet-grid">
+<div class="disc-card">
+<div class="disc-target">TOI-732</div>
+<div class="disc-tic">TIC 307210830 · MAST TESS S04</div>
+<div class="disc-pred">Planet Candidate</div>
+<div class="disc-meta"><span>Confidence</span><strong>92.0%</strong></div>
+<div class="disc-meta"><span>Quality</span><strong>95 / 100</strong></div>
+<div class="disc-meta"><span>Miner</span><span class="hash">0xfdAD...a363</span></div>
+<div class="disc-meta"><span>Period</span><strong>0.768 d</strong></div>
+</div>
+<div class="disc-card">
+<div class="disc-target">TOI-700</div>
+<div class="disc-tic">TIC 36724087 · MAST TESS S01</div>
+<div class="disc-pred">Planet Candidate</div>
+<div class="disc-meta"><span>Confidence</span><strong>88.5%</strong></div>
+<div class="disc-meta"><span>Quality</span><strong>91 / 100</strong></div>
+<div class="disc-meta"><span>Miner</span><span class="hash">0xabcd...1234</span></div>
+<div class="disc-meta"><span>Period</span><strong>37.42 d</strong></div>
+</div>
+<div class="disc-card">
+<div class="disc-target">TOI-1452</div>
+<div class="disc-tic">TIC 261136679 · MAST TESS S14</div>
+<div class="disc-pred">Planet Candidate</div>
+<div class="disc-meta"><span>Confidence</span><strong>86.2%</strong></div>
+<div class="disc-meta"><span>Quality</span><strong>87 / 100</strong></div>
+<div class="disc-meta"><span>Miner</span><span class="hash">0x9876...5432</span></div>
+<div class="disc-meta"><span>Period</span><strong>11.06 d</strong></div>
+</div>
+</div>
+</div>
 
-      <div class="discovery-card">
-        <div class="discovery-target">TOI-700</div>
-        <div class="discovery-tic">TIC 36724087 · MAST TESS S01</div>
-        <div class="discovery-prediction">▲ Planet Candidate</div>
-        <div class="discovery-meta"><span>Confidence</span><strong>88.5%</strong></div>
-        <div class="discovery-meta"><span>Quality</span><strong>91 / 100</strong></div>
-        <div class="discovery-meta"><span>Miner</span><span class="hash">0xabcd...1234</span></div>
-        <div class="discovery-meta"><span>Period</span><strong>37.42 d</strong></div>
-      </div>
+<div class="tab-content" data-tab="galaxy">
+<div class="disc-grid">
+<div class="disc-card">
+<div class="disc-target">NGC 4565</div>
+<div class="disc-tic">SDSS DR18 · J123555.95+255732.8</div>
+<div class="disc-pred spiral">Spiral Edge-On</div>
+<div class="disc-meta"><span>Confidence</span><strong>94.1%</strong></div>
+<div class="disc-meta"><span>Quality</span><strong>96 / 100</strong></div>
+<div class="disc-meta"><span>Miner</span><span class="hash">0x1111...2222</span></div>
+<div class="disc-meta"><span>z (redshift)</span><strong>0.0043</strong></div>
+</div>
+</div>
+</div>
 
-      <div class="discovery-card">
-        <div class="discovery-target">TOI-1452</div>
-        <div class="discovery-tic">TIC 261136679 · MAST TESS S14</div>
-        <div class="discovery-prediction">▲ Planet Candidate</div>
-        <div class="discovery-meta"><span>Confidence</span><strong>86.2%</strong></div>
-        <div class="discovery-meta"><span>Quality</span><strong>87 / 100</strong></div>
-        <div class="discovery-meta"><span>Miner</span><span class="hash">0x9876...5432</span></div>
-        <div class="discovery-meta"><span>Period</span><strong>11.06 d</strong></div>
-      </div>
-    </div>
-  </div>
+<div class="tab-content" data-tab="anomaly">
+<div class="disc-grid">
+<div class="disc-card">
+<div class="disc-target">ZTF18abc...</div>
+<div class="disc-tic">ZTF Survey · 2026-06-04 · r-band</div>
+<div class="disc-pred anomaly">High Anomaly Score</div>
+<div class="disc-meta"><span>Anomaly Score</span><strong>0.92</strong></div>
+<div class="disc-meta"><span>Quality</span><strong>88 / 100</strong></div>
+<div class="disc-meta"><span>Miner</span><span class="hash">0x3333...4444</span></div>
+<div class="disc-meta"><span>Follow-up</span><strong>TNS submitted</strong></div>
+</div>
+</div>
+</div>
 
-  <div class="tab-content" data-tab="galaxy">
-    <div class="discoveries-grid">
-      <div class="discovery-card">
-        <div class="discovery-target">NGC 4565</div>
-        <div class="discovery-tic">SDSS DR18 · J123555.95+255732.8</div>
-        <div class="discovery-prediction spiral">◎ Spiral Edge-On</div>
-        <div class="discovery-meta"><span>Confidence</span><strong>94.1%</strong></div>
-        <div class="discovery-meta"><span>Quality</span><strong>96 / 100</strong></div>
-        <div class="discovery-meta"><span>Miner</span><span class="hash">0x1111...2222</span></div>
-        <div class="discovery-meta"><span>z (redshift)</span><strong>0.0043</strong></div>
-      </div>
-    </div>
-  </div>
+<div class="section-header" id="submissions">
+<h2><span class="label">Recent Activity</span>Latest Submissions</h2>
+<span class="badge live">Live</span>
+</div>
 
-  <div class="tab-content" data-tab="anomaly">
-    <div class="discoveries-grid">
-      <div class="discovery-card">
-        <div class="discovery-target">ZTF18abc...</div>
-        <div class="discovery-tic">ZTF Survey · 2026-06-04 · r-band</div>
-        <div class="discovery-prediction anomaly">△ High Anomaly Score</div>
-        <div class="discovery-meta"><span>Anomaly Score</span><strong>0.92</strong></div>
-        <div class="discovery-meta"><span>Quality</span><strong>88 / 100</strong></div>
-        <div class="discovery-meta"><span>Miner</span><span class="hash">0x3333...4444</span></div>
-        <div class="discovery-meta"><span>Follow-up</span><strong>TNS&nbsp;submitted</strong></div>
-      </div>
-    </div>
-  </div>
+<div class="stbl">
+<table>
+<thead><tr><th>ID</th><th>Task</th><th>Target</th><th>Prediction</th><th>Quality</th><th>Miner</th><th>IPFS</th><th>When</th></tr></thead>
+<tbody id="submissions-tbody">
+<tr><td>#12,345</td><td>Exoplanet</td><td>TOI-732</td><td><span style="color:var(--green)">PLANET</span> 92.0%</td><td><span class="qpill excellent">95</span></td><td class="hash"><a href="#">0xfdAD...a363</a></td><td class="hash"><a href="https://ipfs.io/ipfs/QmXxx" target="_blank">QmXxx...</a></td><td>2 min ago</td></tr>
+<tr><td>#12,344</td><td>Galaxy</td><td>NGC 4565</td><td><span style="color:var(--cyan)">Spiral</span> 94.1%</td><td><span class="qpill excellent">96</span></td><td class="hash"><a href="#">0x1111...2222</a></td><td class="hash"><a href="https://ipfs.io/ipfs/QmYyy" target="_blank">QmYyy...</a></td><td>5 min ago</td></tr>
+<tr><td>#12,343</td><td>Exoplanet</td><td>TOI-1452</td><td><span style="color:var(--green)">PLANET</span> 88.5%</td><td><span class="qpill excellent">91</span></td><td class="hash"><a href="#">0xabcd...1234</a></td><td class="hash"><a href="https://ipfs.io/ipfs/QmZzz" target="_blank">QmZzz...</a></td><td>8 min ago</td></tr>
+<tr><td>#12,342</td><td>Anomaly</td><td>ZTF18abc</td><td><span style="color:var(--amber)">score 0.87</span></td><td><span class="qpill good">84</span></td><td class="hash"><a href="#">0x3333...4444</a></td><td class="hash"><a href="https://ipfs.io/ipfs/QmAaa" target="_blank">QmAaa...</a></td><td>12 min ago</td></tr>
+<tr><td>#12,341</td><td>Exoplanet</td><td>TOI-700</td><td><span style="color:var(--amber)">NO_SIGNAL</span> 60%</td><td><span class="qpill accepted">57</span></td><td class="hash"><a href="#">0x5678...9012</a></td><td class="hash"><a href="https://ipfs.io/ipfs/QmBbb" target="_blank">QmBbb...</a></td><td>15 min ago</td></tr>
+</tbody>
+</table>
+</div>
 
-  <div class="section-header" id="submissions">
-    <h2><span class="label">Recent Activity</span>Latest Submissions</h2>
-    <span class="badge live">Live</span>
-  </div>
+<div class="section-header" id="miners">
+<h2><span class="label">Operator Leaderboard</span>Top Miners</h2>
+</div>
 
-  <div class="submissions-table">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Task</th>
-          <th>Target</th>
-          <th>Prediction</th>
-          <th>Quality</th>
-          <th>Miner</th>
-          <th>IPFS</th>
-          <th>When</th>
-        </tr>
-      </thead>
-      <tbody id="submissions-tbody">
-        <tr>
-          <td>#12,345</td>
-          <td>Exoplanet</td>
-          <td>TOI-732</td>
-          <td><span style="color:var(--green)">PLANET</span> 92.0%</td>
-          <td><span class="quality-pill excellent">95</span></td>
-          <td class="hash"><a href="#">0xfdAD...a363</a></td>
-          <td class="hash"><a href="https://ipfs.io/ipfs/QmXxx" target="_blank">QmXxx...</a></td>
-          <td>2 min ago</td>
-        </tr>
-        <tr>
-          <td>#12,344</td>
-          <td>Galaxy</td>
-          <td>NGC 4565</td>
-          <td><span style="color:var(--cyan)">Spiral</span> 94.1%</td>
-          <td><span class="quality-pill excellent">96</span></td>
-          <td class="hash"><a href="#">0x1111...2222</a></td>
-          <td class="hash"><a href="https://ipfs.io/ipfs/QmYyy" target="_blank">QmYyy...</a></td>
-          <td>5 min ago</td>
-        </tr>
-        <tr>
-          <td>#12,343</td>
-          <td>Exoplanet</td>
-          <td>TOI-1452</td>
-          <td><span style="color:var(--green)">PLANET</span> 88.5%</td>
-          <td><span class="quality-pill excellent">91</span></td>
-          <td class="hash"><a href="#">0xabcd...1234</a></td>
-          <td class="hash"><a href="https://ipfs.io/ipfs/QmZzz" target="_blank">QmZzz...</a></td>
-          <td>8 min ago</td>
-        </tr>
-        <tr>
-          <td>#12,342</td>
-          <td>Anomaly</td>
-          <td>ZTF18abc</td>
-          <td><span style="color:var(--amber)">score 0.87</span></td>
-          <td><span class="quality-pill good">84</span></td>
-          <td class="hash"><a href="#">0x3333...4444</a></td>
-          <td class="hash"><a href="https://ipfs.io/ipfs/QmAaa" target="_blank">QmAaa...</a></td>
-          <td>12 min ago</td>
-        </tr>
-        <tr>
-          <td>#12,341</td>
-          <td>Exoplanet</td>
-          <td>TOI-700</td>
-          <td><span style="color:var(--amber)">NO_SIGNAL</span> 60%</td>
-          <td><span class="quality-pill accepted">57</span></td>
-          <td class="hash"><a href="#">0x5678...9012</a></td>
-          <td class="hash"><a href="https://ipfs.io/ipfs/QmBbb" target="_blank">QmBbb...</a></td>
-          <td>15 min ago</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="stbl">
+<table>
+<thead><tr><th>Rank</th><th>Miner</th><th>Submissions</th><th>Avg Quality</th><th>VOID Earned</th><th>Discoveries</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="hash"><a href="#">0xfdAD...a363</a></td><td>3,421</td><td><span class="qpill excellent">89</span></td><td>127,453</td><td>17 ★</td></tr>
+<tr><td>2</td><td class="hash"><a href="#">0xabcd...1234</a></td><td>2,876</td><td><span class="qpill excellent">86</span></td><td>98,221</td><td>12 ★</td></tr>
+<tr><td>3</td><td class="hash"><a href="#">0x1111...2222</a></td><td>2,103</td><td><span class="qpill good">82</span></td><td>71,089</td><td>8 ★</td></tr>
+<tr><td>4</td><td class="hash"><a href="#">0x3333...4444</a></td><td>1,567</td><td><span class="qpill good">78</span></td><td>48,902</td><td>5 ★</td></tr>
+</tbody>
+</table>
+</div>
 
-  <div class="section-header" id="miners">
-    <h2><span class="label">Operator Leaderboard</span>Top Miners</h2>
-    <span class="badge">All-time</span>
-  </div>
+<div class="section-header" id="network">
+<h2><span class="label">Chain State</span>Network</h2>
+<span class="badge mainnet">Mainnet</span>
+</div>
 
-  <div class="submissions-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Miner</th>
-          <th>Submissions</th>
-          <th>Avg Quality</th>
-          <th>VOID Earned</th>
-          <th>Discoveries</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="rank-medal">◆</span>1</td>
-          <td class="hash"><a href="#">0xfdAD...a363</a></td>
-          <td>3,421</td>
-          <td><span class="quality-pill excellent">89</span></td>
-          <td>127,453</td>
-          <td>17 ★</td>
-        </tr>
-        <tr>
-          <td><span class="rank-medal">◆</span>2</td>
-          <td class="hash"><a href="#">0xabcd...1234</a></td>
-          <td>2,876</td>
-          <td><span class="quality-pill excellent">86</span></td>
-          <td>98,221</td>
-          <td>12 ★</td>
-        </tr>
-        <tr>
-          <td><span class="rank-medal">◆</span>3</td>
-          <td class="hash"><a href="#">0x1111...2222</a></td>
-          <td>2,103</td>
-          <td><span class="quality-pill good">82</span></td>
-          <td>71,089</td>
-          <td>8 ★</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td class="hash"><a href="#">0x3333...4444</a></td>
-          <td>1,567</td>
-          <td><span class="quality-pill good">78</span></td>
-          <td>48,902</td>
-          <td>5 ★</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section-header" id="network">
-    <h2><span class="label">Chain State</span>Network</h2>
-    <span class="badge mainnet">Mainnet</span>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">▥</div>
-      <div class="stat-value" id="stat-block">—</div>
-      <div class="stat-label">Block Height</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">◐</div>
-      <div class="stat-value" id="stat-halving">—</div>
-      <div class="stat-label">Halving Epoch</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">◈</div>
-      <div class="stat-value" id="stat-reward">—</div>
-      <div class="stat-label">Block Reward · VOID</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">▽</div>
-      <div class="stat-value" id="stat-burned">—</div>
-      <div class="stat-label">Total Burned · VOID</div>
-    </div>
-  </div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">▥</div><div class="stat-value" id="stat-block">—</div><div class="stat-label">Block Height</div></div>
+<div class="stat-card"><div class="stat-icon">◐</div><div class="stat-value" id="stat-halving">—</div><div class="stat-label">Halving Epoch</div></div>
+<div class="stat-card"><div class="stat-icon">◈</div><div class="stat-value" id="stat-reward">—</div><div class="stat-label">Block Reward · VOID</div></div>
+<div class="stat-card"><div class="stat-icon">▽</div><div class="stat-value" id="stat-burned">—</div><div class="stat-label">Total Burned · VOID</div></div>
+</div>
 </main>
 
 <footer>
-  <p>Voidmap Explorer · Mission Telemetry · Powered by <a href="https://voidmap.org">Voidmap</a> on <a href="https://base.org">Base</a></p>
-  <p>All results permanently recorded on-chain · <a href="https://github.com/thekillsquad007/voidmap/wiki/Result-Registry" target="_blank">View Result Registry →</a></p>
+<p>Voidmap Explorer · Mission Telemetry · Powered by <a href="index.html">Voidmap</a> on <a href="https://base.org">Base</a></p>
+<p>All results permanently recorded on-chain · <a href="https://github.com/thekillsquad007/voidmap/wiki/Result-Registry" target="_blank">View Result Registry →</a></p>
 </footer>
 
 </div>
 
 <script>
-// 3-layer parallax starfield (matches index.html + howto.html)
-const starsCanvas = [
-  document.getElementById('stars'),
-  document.getElementById('stars2'),
-  document.getElementById('stars3')
-];
-const contexts = starsCanvas.map(c => c.getContext('2d'));
-const starLayers = [[], [], []];
-const starCounts = [80, 140, 240];
-const starSpeeds = [0.05, 0.12, 0.25];
-const starSizes = [0.4, 0.7, 1.1];
+const MOCK={planets:47,galaxies:1283,anomalies:23,samples:"4.2M",submissions:12345,miners:87,block:12456789,halving:0,reward:"50.0",burned:"127K"};
+for(const[id,val]of Object.entries(MOCK)){const el=document.getElementById('stat-'+id);if(el)el.textContent=typeof val==='number'?val.toLocaleString():val;const navEl=document.getElementById('nav-'+id);if(navEl)navEl.textContent=typeof val==='number'?val.toLocaleString():val}
 
-function resize() {
-  starsCanvas.forEach(c => { c.width = innerWidth; c.height = innerHeight; });
-}
-resize();
-addEventListener('resize', resize);
+document.querySelectorAll('.tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const target=tab.dataset.tab;document.querySelector(`.tab-content[data-tab="${target}"]`).classList.add('active')})});
 
-for (let i = 0; i < 3; i++) {
-  for (let j = 0; j < starCounts[i]; j++) {
-    starLayers[i].push({
-      x: Math.random() * innerWidth,
-      y: Math.random() * innerHeight,
-      r: Math.random() * starSizes[i] + 0.3,
-      a: Math.random() * 0.6 + 0.2,
-      tw: Math.random() * Math.PI * 2,
-      dx: (Math.random() - 0.5) * starSpeeds[i],
-      dy: (Math.random() - 0.5) * starSpeeds[i]
-    });
-  }
-}
-
-let t = 0;
-function draw() {
-  t += 0.016;
-  contexts.forEach((ctx, i) => {
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    for (const s of starLayers[i]) {
-      s.x += s.dx;
-      s.y += s.dy;
-      if (s.x < 0) s.x = innerWidth;
-      if (s.x > innerWidth) s.x = 0;
-      if (s.y < 0) s.y = innerHeight;
-      if (s.y > innerHeight) s.y = 0;
-      const twinkle = 0.7 + Math.sin(t * 1.5 + s.tw) * 0.3;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${i === 2 ? '255,255,255' : '180,210,255'},${s.a * twinkle})`;
-      ctx.fill();
-    }
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-// Mock data — in production, fetched from RPC
-const MOCK = {
-  planets: 47,
-  galaxies: 1283,
-  anomalies: 23,
-  samples: "4.2M",
-  submissions: 12345,
-  miners: 87,
-  block: 12456789,
-  halving: 0,
-  reward: "50.0",
-  burned: "127K"
-};
-
-for (const [id, val] of Object.entries(MOCK)) {
-  const el = document.getElementById('stat-' + id);
-  if (el) el.textContent = val.toLocaleString();
-  const navEl = document.getElementById('nav-' + id);
-  if (navEl) navEl.textContent = val.toLocaleString();
-}
-
-// Tabs
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const target = tab.dataset.tab;
-    document.querySelector(`.tab-content[data-tab="${target}"]`).classList.add('active');
-  });
-});
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const href = a.getAttribute('href');
-    if (href.length > 1) {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const href=a.getAttribute('href');if(href.length>1){e.preventDefault();const t=document.querySelector(href);if(t)t.scrollIntoView({behavior:'smooth'})}})});
 </script>
 </body>
 </html>

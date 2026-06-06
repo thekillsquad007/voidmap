@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>◇</text></svg>">
 <title>How to Mine VOID — Step-by-Step Guide · Voidmap</title>
 <meta name="description" content="Step-by-step guide to mining Voidmap. From install to your first VOID token in 5 minutes.">
@@ -11,301 +11,239 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#03050d;--bg2:#070b1c;--bg3:#0d1428;
-  --fg:#e8ecf5;--fg2:#8b9bb8;--fg3:#5d6b86;--fg4:#3a4459;
-  --cyan:#4dd6ff;--cyan-dim:rgba(77,214,255,0.15);
-  --amber:#ffc857;--amber-dim:rgba(255,200,87,0.15);
-  --violet:#a78bfa;--violet-dim:rgba(167,139,250,0.15);
-  --red:#ff5c5c;--red-dim:rgba(255,92,92,0.15);
-  --green:#5ee89e;--green-dim:rgba(94,232,158,0.15);
-  --grad-cyan:linear-gradient(135deg,#4dd6ff 0%,#a78bfa 100%);
-  --grad-amber:linear-gradient(135deg,#ffc857 0%,#ff5c5c 100%);
-  --grad-nebula:radial-gradient(ellipse at 30% 20%,rgba(77,214,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(167,139,250,0.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 90%,rgba(255,200,87,0.04) 0%,transparent 40%);
+--bg:#060818;--bg2:#0c0f24;--bg3:#121638;--fg:#e4e8f4;--fg2:#9aa3c0;--fg3:#5c6480;
+--cyan:#4dd6ff;--cyan2:rgba(77,214,255,.12);--amber:#ffc857;--amber2:rgba(255,200,87,.12);
+--violet:#a78bfa;--violet2:rgba(167,139,250,.12);--red:#ff5c5c;--red2:rgba(255,92,92,.12);
+--green:#5ee89e;--green2:rgba(94,232,158,.12);
 }
-*{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  background:var(--bg);color:var(--fg);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
-  line-height:1.65;overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
 body::before{
-  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:var(--grad-nebula);
+content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+background:
+radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.6),transparent),
+radial-gradient(1px 1px at 25% 45%,rgba(180,210,255,.5),transparent),
+radial-gradient(1.5px 1.5px at 40% 15%,rgba(255,255,255,.7),transparent),
+radial-gradient(1px 1px at 55% 70%,rgba(180,210,255,.4),transparent),
+radial-gradient(1px 1px at 70% 30%,rgba(255,255,255,.5),transparent),
+radial-gradient(1.5px 1.5px at 85% 60%,rgba(180,210,255,.6),transparent),
+radial-gradient(1px 1px at 15% 80%,rgba(255,255,255,.4),transparent),
+radial-gradient(1px 1px at 90% 10%,rgba(180,210,255,.5),transparent),
+radial-gradient(ellipse at 25% 15%,rgba(77,214,255,.06),transparent 50%),
+radial-gradient(ellipse at 75% 70%,rgba(167,139,250,.04),transparent 50%);
 }
-.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
-canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .wrap{position:relative;z-index:1}
+.mono{font-family:'JetBrains Mono',monospace}
 
 nav{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:0.85rem 2rem;position:fixed;top:0;width:100%;
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  background:rgba(3,5,13,0.75);
-  z-index:100;
-  border-bottom:1px solid rgba(77,214,255,0.08);
-  font-size:0.85rem;
+position:sticky;top:0;z-index:100;
+display:flex;justify-content:space-between;align-items:center;
+padding:.75rem 2rem;
+background:rgba(6,8,24,.85);backdrop-filter:blur(16px);
+border-bottom:1px solid rgba(77,214,255,.08);
+font-size:.85rem;
 }
-nav .logo{
-  font-weight:800;font-size:1.05rem;letter-spacing:0.05em;
-  background:var(--grad-cyan);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-decoration:none;
-}
-nav .logo::before{content:'◇ ';opacity:0.8;-webkit-text-fill-color:var(--cyan)}
-nav .telemetry{
-  display:flex;align-items:center;gap:1rem;
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
-  color:var(--fg2);text-transform:uppercase;letter-spacing:0.08em;
-}
-nav .telemetry .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s ease-in-out infinite}
-nav .telemetry .sep{color:var(--fg4)}
-nav .telemetry .label{color:var(--fg3)}
-nav .telemetry .val{color:var(--cyan)}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
-nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.25rem;font-weight:500;transition:color 0.2s}
+nav .logo{font-weight:800;font-size:1rem;letter-spacing:.06em;color:var(--cyan);text-decoration:none}
+nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.2rem;font-weight:500;transition:color .2s}
 nav .nav-links a:hover{color:var(--cyan)}
 
-main{max-width:880px;margin:0 auto;padding:3.5rem 2rem 3rem;position:relative}
-.page-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(77,214,255,0.1)}
-.page-header .mission-id{
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;
-  text-transform:uppercase;color:var(--cyan);margin-bottom:0.75rem;
-  display:flex;align-items:center;gap:0.5rem;
-}
-.page-header .mission-id .line{width:24px;height:1px;background:var(--cyan)}
-.page-header h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:900;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.5rem}
-.page-header h1 .grad{background:var(--grad-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.page-header .subtitle{font-size:1.1rem;color:var(--fg2);max-width:640px}
+main{max-width:820px;margin:0 auto;padding:2rem 2rem 3rem}
 
-h2{font-size:1.6rem;font-weight:800;margin:3rem 0 1rem;letter-spacing:-0.02em}
-h3{font-size:1.05rem;font-weight:700;margin:1.75rem 0 0.5rem;letter-spacing:-0.01em;color:var(--fg)}
-h4{font-size:0.9rem;font-weight:700;margin:1.25rem 0 0.5rem;color:var(--cyan);text-transform:uppercase;letter-spacing:0.08em;font-family:'JetBrains Mono',monospace;font-size:0.75rem}
-p{margin-bottom:0.75rem;color:var(--fg2)}
+.page-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(77,214,255,.1)}
+.page-header .mid{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:.6rem}
+.page-header h1{font-size:clamp(2rem,4.5vw,3rem);font-weight:900;letter-spacing:-.02em;line-height:1.1;margin-bottom:.4rem}
+.page-header h1 .g1{color:var(--cyan)}
+.page-header .sub{font-size:1rem;color:var(--fg2);max-width:600px}
+
+h2{font-size:1.5rem;font-weight:800;margin:2.5rem 0 .75rem;letter-spacing:-.02em}
+h3{font-size:1rem;font-weight:700;margin:1.5rem 0 .4rem;letter-spacing:-.01em;color:var(--fg)}
+h4{font-size:.7rem;font-weight:700;margin:1rem 0 .4rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
+p{margin-bottom:.65rem;color:var(--fg2)}
 p strong,li strong{color:var(--fg);font-weight:600}
-a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(77,214,255,0.3);transition:all 0.2s}
+a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(77,214,255,.3);transition:all .2s}
 a:hover{border-bottom-style:solid;border-bottom-color:var(--cyan)}
-code{font-family:'JetBrains Mono',monospace;font-size:0.85em;background:rgba(13,20,40,0.8);padding:0.1rem 0.4rem;border-radius:3px;color:var(--cyan);border:1px solid rgba(77,214,255,0.08)}
+code{font-family:'JetBrains Mono',monospace;font-size:.85em;background:rgba(18,22,56,.8);padding:.1rem .35rem;border-radius:3px;color:var(--cyan);border:1px solid rgba(77,214,255,.08)}
 
 .toc{
-  background:rgba(7,11,28,0.5);border:1px solid rgba(77,214,255,0.1);
-  border-radius:8px;padding:1.5rem 2rem;margin:2rem 0 3rem;
-  backdrop-filter:blur(8px);
+background:rgba(12,15,36,.5);border:1px solid rgba(77,214,255,.1);
+border-radius:8px;padding:1.25rem 1.5rem;margin:1.5rem 0 2rem;
+backdrop-filter:blur(8px);
 }
-.toc h2{margin:0 0 0.75rem;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600}
+.toc h2{margin:0 0 .6rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:600}
 .toc ol{margin-left:1.5rem}
-.toc li{margin-bottom:0.35rem;color:var(--fg2);font-size:0.9rem}
+.toc li{margin-bottom:.3rem;color:var(--fg2);font-size:.88rem}
 .toc a{color:var(--fg2);border-bottom:none;font-weight:500}
 .toc a:hover{color:var(--cyan)}
 
 .step{
-  background:rgba(7,11,28,0.4);border:1px solid rgba(77,214,255,0.08);
-  border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;
-  position:relative;backdrop-filter:blur(8px);
-  border-left:2px solid var(--cyan);
+background:rgba(12,15,36,.4);border:1px solid rgba(77,214,255,.08);
+border-radius:8px;padding:1.5rem;margin-bottom:1rem;
+position:relative;backdrop-filter:blur(8px);
+border-left:2px solid var(--cyan);
 }
-.step-header{display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem}
+.step-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
 .step-number{
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(77,214,255,0.08);border:1px solid rgba(77,214,255,0.3);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--cyan);font-size:0.95rem;
-  flex-shrink:0;
+width:32px;height:32px;border-radius:50%;
+background:rgba(77,214,255,.08);border:1px solid rgba(77,214,255,.25);
+display:flex;align-items:center;justify-content:center;
+font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--cyan);font-size:.9rem;
+flex-shrink:0;
 }
-.step-title{font-size:1.25rem;font-weight:800;letter-spacing:-0.01em;color:var(--fg)}
+.step-title{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;color:var(--fg)}
 .step-time{
-  font-family:'JetBrains Mono',monospace;font-size:0.7rem;
-  color:var(--amber);text-transform:uppercase;letter-spacing:0.1em;
-  margin-bottom:1rem;display:inline-block;
-  background:var(--amber-dim);padding:0.2rem 0.6rem;border-radius:3px;
-  border:1px solid rgba(255,200,87,0.15);
+font-family:'JetBrains Mono',monospace;font-size:.65rem;
+color:var(--amber);text-transform:uppercase;letter-spacing:.08em;
+margin-bottom:.75rem;display:inline-block;
+background:var(--amber2);padding:.15rem .5rem;border-radius:3px;
+border:1px solid rgba(255,200,87,.15);
 }
 
 pre{
-  background:rgba(3,5,13,0.7);padding:1.1rem 1.25rem;
-  border-radius:6px;margin:1rem 0;font-size:0.8rem;line-height:1.6;
-  overflow-x:auto;border:1px solid rgba(77,214,255,0.1);
-  font-family:'JetBrains Mono',monospace;color:var(--fg);
-  position:relative;
+background:rgba(6,8,24,.7);padding:1rem 1.15rem;
+border-radius:6px;margin:.75rem 0;font-size:.78rem;line-height:1.6;
+overflow-x:auto;border:1px solid rgba(77,214,255,.08);
+font-family:'JetBrains Mono',monospace;color:var(--fg);
+position:relative;
 }
 pre::before{
-  content:'TERMINAL';position:absolute;top:0.4rem;right:0.75rem;
-  font-size:0.55rem;letter-spacing:0.15em;color:var(--fg3);
-  font-family:'JetBrains Mono',monospace;
+content:'TERMINAL';position:absolute;top:.35rem;right:.65rem;
+font-size:.5rem;letter-spacing:.12em;color:var(--fg3);
+font-family:'JetBrains Mono',monospace;
 }
 pre code{background:none;padding:0;border:none;color:inherit;font-size:inherit}
 
-ol,ul{margin-left:1.5rem;margin-bottom:1rem;color:var(--fg2)}
-li{margin-bottom:0.4rem;line-height:1.6}
-li code{font-size:0.8em}
+ol,ul{margin-left:1.5rem;margin-bottom:.75rem;color:var(--fg2)}
+li{margin-bottom:.35rem;line-height:1.55}
+li code{font-size:.8em}
 
-.platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0.6rem;margin:1rem 0}
+.platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin:.75rem 0}
 .platform{
-  background:rgba(13,20,40,0.5);border:1px solid rgba(77,214,255,0.08);
-  border-radius:6px;padding:0.85rem 1rem;
-  border-left:2px solid var(--cyan);
+background:rgba(18,22,56,.5);border:1px solid rgba(77,214,255,.08);
+border-radius:6px;padding:.7rem .85rem;border-left:2px solid var(--cyan);
 }
-.platform-name{font-weight:700;color:var(--fg);font-size:0.9rem;margin-bottom:0.15rem}
-.platform-detail{font-size:0.75rem;color:var(--fg2);font-family:'JetBrains Mono',monospace;line-height:1.4}
+.platform-name{font-weight:700;color:var(--fg);font-size:.88rem;margin-bottom:.1rem}
+.platform-detail{font-size:.72rem;color:var(--fg2);font-family:'JetBrains Mono',monospace;line-height:1.4}
 
 .tip,.warning,.note{
-  border-radius:6px;padding:0.85rem 1.1rem;margin:1rem 0;
-  font-size:0.88rem;line-height:1.55;
+border-radius:6px;padding:.75rem 1rem;margin:.75rem 0;
+font-size:.85rem;line-height:1.55;
 }
-.tip{background:rgba(94,232,158,0.05);border-left:2px solid var(--green);color:var(--fg2)}
+.tip{background:rgba(94,232,158,.05);border-left:2px solid var(--green);color:var(--fg2)}
 .tip strong{color:var(--green)}
-.warning{background:rgba(255,92,92,0.05);border-left:2px solid var(--red);color:var(--fg2)}
+.warning{background:rgba(255,92,92,.05);border-left:2px solid var(--red);color:var(--fg2)}
 .warning strong{color:var(--red)}
-.note{background:rgba(77,214,255,0.05);border-left:2px solid var(--cyan);color:var(--fg2)}
+.note{background:rgba(77,214,255,.05);border-left:2px solid var(--cyan);color:var(--fg2)}
 .note strong{color:var(--cyan)}
 
-.next-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin:1.5rem 0}
+.next-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem;margin:1.25rem 0}
 .next-step{
-  display:block;background:rgba(7,11,28,0.5);
-  border:1px solid rgba(77,214,255,0.1);border-radius:8px;
-  padding:1.25rem;text-decoration:none;
-  transition:all 0.2s;border-bottom:1px solid rgba(77,214,255,0.1) !important;
+display:block;background:rgba(12,15,36,.5);
+border:1px solid rgba(77,214,255,.1);border-radius:8px;
+padding:1rem;text-decoration:none;
+transition:all .2s;border-bottom:1px solid rgba(77,214,255,.1)!important;
 }
-.next-step:hover{border-color:var(--cyan) !important;background:rgba(13,20,40,0.7);transform:translateY(-2px)}
-.next-step-title{font-weight:700;color:var(--fg);font-size:0.95rem;margin-bottom:0.3rem}
-.next-step-desc{font-size:0.8rem;color:var(--fg2);line-height:1.4}
+.next-step:hover{border-color:var(--cyan)!important;background:rgba(18,22,56,.7);transform:translateY(-2px)}
+.next-step-title{font-weight:700;color:var(--fg);font-size:.9rem;margin-bottom:.25rem}
+.next-step-desc{font-size:.78rem;color:var(--fg2);line-height:1.4}
 
 footer{
-  text-align:center;padding:3rem 2rem 2.5rem;
-  border-top:1px solid rgba(77,214,255,0.08);margin-top:4rem;
-  font-size:0.8rem;color:var(--fg3);
+text-align:center;padding:2rem 2rem;border-top:1px solid rgba(77,214,255,.08);
+margin-top:3rem;font-size:.78rem;color:var(--fg3);
 }
-footer p{margin-bottom:0.4rem;color:var(--fg3);font-size:0.85rem}
-footer a{color:var(--fg2);border-bottom:1px dotted var(--fg4)}
+footer p{margin-bottom:.3rem;color:var(--fg3);font-size:.82rem}
+footer a{color:var(--fg2);border-bottom:1px dotted var(--fg3)}
 footer a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 
-@media (max-width:980px){
-  nav .telemetry{display:none}
-  main{padding:3rem 1.25rem 2rem}
-  .step{padding:1.25rem}
-  .toc{padding:1.25rem 1.5rem}
-}
-@media (max-width:768px){
-  nav .nav-links a{margin-left:0.75rem;font-size:0.8rem}
-  pre{font-size:0.72rem}
+@media(max-width:768px){
+nav .nav-links{display:none}
+main{padding:1.5rem 1rem}
+.step{padding:1rem}
+.toc{padding:1rem 1.15rem}
+pre{font-size:.72rem}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-<canvas id="stars"></canvas>
-<canvas id="stars2"></canvas>
-<canvas id="stars3"></canvas>
 
 <nav>
-  <a class="logo" href="index.html">VOIDMAP</a>
-  <div class="telemetry">
-    <span><span class="dot"></span></span>
-    <span><span class="label">Survey</span>&nbsp;<span class="val">TESS&nbsp;S56</span></span>
-    <span class="sep">/</span>
-    <span><span class="label">Epoch</span>&nbsp;<span class="val">0</span></span>
-  </div>
-  <div class="nav-links">
-    <a href="index.html#mission">Mission</a>
-    <a href="index.html#targets">Targets</a>
-    <a href="index.html#tasks">Tasks</a>
-    <a href="index.html#mechanics">Mechanics</a>
-    <a href="howto.html">How&nbsp;to&nbsp;Mine</a>
-    <a href="explorer/">Explorer</a>
-    <a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Wiki</a>
-  </div>
+<a class="logo" href="index.html">◇ VOIDMAP</a>
+<div class="nav-links">
+<a href="index.html">Home</a>
+<a href="howto.html">How to Mine</a>
+<a href="explorer/">Explorer</a>
+<a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Wiki</a>
+</div>
 </nav>
 
 <main>
-  <div class="page-header">
-    <div class="mission-id"><span class="line"></span>Procedure&nbsp;VM-001 · Mining Operations</div>
-    <h1>How to Mine <span class="grad">VOID</span></h1>
-    <p class="subtitle">A complete step-by-step guide. From zero to your first VOID token in about 5 minutes.</p>
-  </div>
+<div class="page-header">
+<div class="mid">Procedure VM-001 · Mining Operations</div>
+<h1>How to Mine <span class="g1">VOID</span></h1>
+<p class="sub">A complete step-by-step guide. From zero to your first VOID token in about 5 minutes.</p>
+</div>
 
-  <div class="toc">
-    <h2>Table of Contents</h2>
-    <ol>
-      <li><a href="#step1">Check your hardware</a></li>
-      <li><a href="#step2">Install the miner</a></li>
-      <li><a href="#step3">Set up your wallet</a></li>
-      <li><a href="#step4">Run your first round</a></li>
-      <li><a href="#step5">Submit on-chain</a></li>
-      <li><a href="#step6">Keep mining</a></li>
-      <li><a href="#troubleshoot">Troubleshooting</a></li>
-    </ol>
-  </div>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#step1">Check your hardware</a></li>
+<li><a href="#step2">Install the miner</a></li>
+<li><a href="#step3">Set up your wallet</a></li>
+<li><a href="#step4">Run your first round</a></li>
+<li><a href="#step5">Submit on-chain</a></li>
+<li><a href="#step6">Keep mining</a></li>
+<li><a href="#troubleshoot">Troubleshooting</a></li>
+</ol>
+</div>
 
-  <div class="step" id="step1">
-    <div class="step-header">
-      <div class="step-number">1</div>
-      <div class="step-title">Check your hardware</div>
-    </div>
-    <p class="step-time">⏱ 1 minute</p>
+<div class="step" id="step1">
+<div class="step-header">
+<div class="step-number">1</div>
+<div class="step-title">Check your hardware</div>
+</div>
+<p class="step-time">1 minute</p>
+<p>Voidmap works on virtually any GPU or CPU. Find out what you have:</p>
 
-    <p>Voidmap works on virtually any GPU or CPU. Find out what you have:</p>
+<h3>Windows (PowerShell)</h3>
+<pre><code>wmic path win32_VideoController get name</code></pre>
 
-    <h3>Windows (PowerShell)</h3>
-    <pre><code>wmic path win32_VideoController get name
-# Or Device Manager → Display Adapters</code></pre>
+<h3>macOS</h3>
+<pre><code>system_profiler SPDisplaysDataType | grep "Chipset Model"</code></pre>
 
-    <h3>macOS</h3>
-    <pre><code>system_profiler SPDisplaysDataType | grep "Chipset Model"</code></pre>
+<h3>Linux</h3>
+<pre><code>lspci | grep -iE "vga|3d|display"</code></pre>
 
-    <h3>Linux</h3>
-    <pre><code>lspci | grep -iE "vga|3d|display"</code></pre>
+<h3>What works</h3>
+<div class="platform-grid">
+<div class="platform"><div class="platform-name">NVIDIA</div><div class="platform-detail">GTX 1050 and newer</div></div>
+<div class="platform"><div class="platform-name">AMD</div><div class="platform-detail">RX 400+ · RDNA/GCN 5.0</div></div>
+<div class="platform"><div class="platform-name">Apple Silicon</div><div class="platform-detail">M1 · M2 · M3 · M4</div></div>
+<div class="platform"><div class="platform-name">Intel</div><div class="platform-detail">Arc A380 / A770</div></div>
+<div class="platform"><div class="platform-name">CPU only</div><div class="platform-detail">Always works · slowest</div></div>
+</div>
+<div class="tip"><strong>No GPU?</strong> No problem. The miner runs on CPU too — it's just slower.</div>
+</div>
 
-    <h3>What works</h3>
-    <div class="platform-grid">
-      <div class="platform">
-        <div class="platform-name">NVIDIA</div>
-        <div class="platform-detail">GTX 1050 and newer</div>
-      </div>
-      <div class="platform">
-        <div class="platform-name">AMD</div>
-        <div class="platform-detail">RX 400+ · RDNA/GCN 5.0</div>
-      </div>
-      <div class="platform">
-        <div class="platform-name">Apple Silicon</div>
-        <div class="platform-detail">M1 · M2 · M3 · M4</div>
-      </div>
-      <div class="platform">
-        <div class="platform-name">Intel</div>
-        <div class="platform-detail">Arc A380 / A770</div>
-      </div>
-      <div class="platform">
-        <div class="platform-name">CPU only</div>
-        <div class="platform-detail">Always works · slowest</div>
-      </div>
-    </div>
+<div class="step" id="step2">
+<div class="step-header">
+<div class="step-number">2</div>
+<div class="step-title">Install the miner</div>
+</div>
+<p class="step-time">2 minutes</p>
 
-    <div class="tip">
-      <strong>No GPU?</strong> No problem. The miner runs on CPU too — it's just slower.
-    </div>
-  </div>
+<h3>Option A: One command (recommended)</h3>
+<pre><code>pip install voidmap
+pip install voidmap[all]  # include PyTorch, lightkurve, ONNX</code></pre>
+<p>That's it. You now have four new commands: <code>voidmap</code>, <code>voidmap-detect</code>, <code>voidmap-mine</code>, <code>voidmap-card</code>.</p>
 
-  <div class="step" id="step2">
-    <div class="step-header">
-      <div class="step-number">2</div>
-      <div class="step-title">Install the miner</div>
-    </div>
-    <p class="step-time">⏱ 2 minutes</p>
-
-    <h3>Option A: One command (recommended)</h3>
-    <pre><code>pip install voidmap
-pip install voidmap[all]   # include PyTorch, lightkurve, ONNX</code></pre>
-
-    <p>That's it. You now have four new commands: <code>voidmap</code>, <code>voidmap-detect</code>, <code>voidmap-mine</code>, <code>voidmap-card</code>.</p>
-
-    <h3>Option B: From source</h3>
-    <pre><code>git clone https://github.com/thekillsquad007/voidmap.git
+<h3>Option B: From source</h3>
+<pre><code>git clone https://github.com/thekillsquad007/voidmap.git
 cd voidmap
 pip install -e ".[all]"</code></pre>
 
-    <h3>Option C: Docker</h3>
-    <pre><code># NVIDIA
+<h3>Option C: Docker</h3>
+<pre><code># NVIDIA
 docker run -d --gpus all \
   -e VOIDMAP_PK=0xYOUR_KEY \
   -e VOIDMAP_RPC=https://mainnet.base.org \
@@ -317,84 +255,79 @@ docker run -d --device /dev/kfd --device /dev/dri \
   -e VOIDMAP_RPC=https://mainnet.base.org \
   thekillsquad007/voidmap-miner:latest</code></pre>
 
-    <h3>Verify the install</h3>
-    <pre><code>voidmap-detect</code></pre>
+<h3>Verify the install</h3>
+<pre><code>voidmap-detect</code></pre>
+<p>You should see something like:</p>
+<pre><code> GPU: NVIDIA GeForce RTX 3080 (nvidia)
+ Backend: pytorch-cuda
+ PyTorch: 2.5.0+cu124
+ Platform: Linux-6.x.x</code></pre>
+</div>
 
-    <p>You should see something like:</p>
-    <pre><code>  GPU: NVIDIA GeForce RTX 3080 (nvidia)
-  Backend: pytorch-cuda
-  PyTorch: 2.5.0+cu124
-  Platform: Linux-6.x.x</code></pre>
-  </div>
+<div class="step" id="step3">
+<div class="step-header">
+<div class="step-number">3</div>
+<div class="step-title">Set up your wallet</div>
+</div>
+<p class="step-time">2 minutes</p>
+<p>To receive VOID tokens, you need a wallet on Base L2.</p>
 
-  <div class="step" id="step3">
-    <div class="step-header">
-      <div class="step-number">3</div>
-      <div class="step-title">Set up your wallet</div>
-    </div>
-    <p class="step-time">⏱ 2 minutes</p>
+<h3>Recommended: Coinbase Wallet or MetaMask</h3>
+<ol>
+<li>Install <a href="https://www.coinbase.com/wallet" target="_blank">Coinbase Wallet</a> or <a href="https://metamask.io" target="_blank">MetaMask</a></li>
+<li>Add the Base network:
+<ul>
+<li>Network: <code>Base</code></li>
+<li>RPC: <code>https://mainnet.base.org</code></li>
+<li>Chain ID: <code>8453</code></li>
+<li>Currency: <code>ETH</code></li>
+<li>Explorer: <code>https://basescan.org</code></li>
+</ul>
+</li>
+<li>Fund with at least <code>0.001 ETH</code> for gas (~$3)</li>
+</ol>
 
-    <p>To receive VOID tokens, you need a wallet on Base L2.</p>
+<h3>Export your private key</h3>
+<p>The miner needs your private key to sign transactions. <strong>Use a fresh wallet for mining</strong> — never your main wallet.</p>
 
-    <h3>Recommended: Coinbase Wallet or MetaMask</h3>
-    <ol>
-      <li>Install <a href="https://www.coinbase.com/wallet" target="_blank">Coinbase Wallet</a> or <a href="https://metamask.io" target="_blank">MetaMask</a></li>
-      <li>Add the Base network:
-        <ul>
-          <li>Network: <code>Base</code></li>
-          <li>RPC: <code>https://mainnet.base.org</code></li>
-          <li>Chain ID: <code>8453</code></li>
-          <li>Currency: <code>ETH</code></li>
-          <li>Explorer: <code>https://basescan.org</code></li>
-        </ul>
-      </li>
-      <li>Fund with at least <code>0.001 ETH</code> for gas (~$3)</li>
-    </ol>
+<div class="warning"><strong>Security:</strong> The private key is stored in your shell environment. Never commit it to git, never share it, never use a wallet with significant funds.</div>
 
-    <h3>Export your private key</h3>
-    <p>The miner needs your private key to sign transactions. <strong>Use a fresh wallet for mining</strong> — never your main wallet.</p>
+<p>To export from MetaMask:</p>
+<ol>
+<li>Click your account icon → <strong>Account details</strong></li>
+<li>Click <strong>Export Private Key</strong></li>
+<li>Enter your password</li>
+<li>Copy the key (starts with <code>0x</code>)</li>
+</ol>
 
-    <div class="warning">
-      <strong>⚠️ Security:</strong> The private key is stored in your shell environment. Never commit it to git, never share it, never use a wallet with significant funds.
-    </div>
-
-    <p>To export from MetaMask:</p>
-    <ol>
-      <li>Click your account icon → <strong>Account details</strong></li>
-      <li>Click <strong>Export Private Key</strong></li>
-      <li>Enter your password</li>
-      <li>Copy the key (starts with <code>0x</code>)</li>
-    </ol>
-
-    <pre><code># Save it to your environment
+<pre><code># Save it to your environment
 export VOIDMAP_PK=0xYOUR_PRIVATE_KEY_HERE
 
 # Or pass it directly to the miner
 voidmap-mine --pk 0xYOUR_KEY</code></pre>
-  </div>
+</div>
 
-  <div class="step" id="step4">
-    <div class="step-header">
-      <div class="step-number">4</div>
-      <div class="step-title">Run your first round</div>
-    </div>
-    <p class="step-time">⏱ 30 seconds</p>
+<div class="step" id="step4">
+<div class="step-header">
+<div class="step-number">4</div>
+<div class="step-title">Run your first round</div>
+</div>
+<p class="step-time">30 seconds</p>
 
-    <h3>Try the TUI dashboard</h3>
-    <pre><code>voidmap</code></pre>
+<h3>Try the TUI dashboard</h3>
+<pre><code>voidmap</code></pre>
+<p>You'll see a live dashboard showing your GPU, current task, predictions, and earnings. Keyboard shortcuts:</p>
+<ul>
+<li><code>q</code> — quit</li>
+<li><code>p</code> — pause / resume</li>
+<li><code>t</code> — switch task</li>
+<li><code>d</code> — show discoveries</li>
+<li><code>r</code> — show recent rounds</li>
+<li><code>Enter</code> — mine one round</li>
+</ul>
 
-    <p>You'll see a live dashboard showing your GPU, current task, predictions, and earnings. Keyboard shortcuts:</p>
-    <ul>
-      <li><code>q</code> — quit</li>
-      <li><code>p</code> — pause / resume</li>
-      <li><code>t</code> — switch task</li>
-      <li><code>d</code> — show discoveries</li>
-      <li><code>r</code> — show recent rounds</li>
-      <li><code>Enter</code> — mine one round</li>
-    </ul>
-
-    <h3>Or use the non-TUI miner</h3>
-    <pre><code># Mine 10 exoplanet rounds
+<h3>Or use the non-TUI miner</h3>
+<pre><code># Mine 10 exoplanet rounds
 voidmap-mine --task exoplanet --rounds 10
 
 # Mine all 3 task types
@@ -403,75 +336,72 @@ voidmap-mine --task all --rounds 30
 # Run forever
 voidmap-mine --task exoplanet</code></pre>
 
-    <p>Sample output:</p>
-    <pre><code>  ◆ VOIDMAP MINER — Non-TUI Mode
-  GPU: NVIDIA GeForce RTX 3080
-  Backend: pytorch-cuda
-  Task: exoplanet
-  Rounds: 3
+<p>Sample output:</p>
+<pre><code> ◆ VOIDMAP MINER — Non-TUI Mode
+ GPU: NVIDIA GeForce RTX 3080
+ Backend: pytorch-cuda
+ Task: exoplanet
+ Rounds: 3
 
-  [1/3] TOI-700: NO_SIGNAL (60.0%) Q=54 4521ms
-  [2/3] TOI-732: PLANET (87.3%) Q=89 4102ms
-    ★ DISCOVERY!
-  [3/3] TOI-1452: NO_SIGNAL (60.0%) Q=57 4287ms
+ [1/3] TOI-700: NO_SIGNAL (60.0%) Q=54 4521ms
+ [2/3] TOI-732: PLANET (87.3%) Q=89 4102ms
+ ★ DISCOVERY!
+ [3/3] TOI-1452: NO_SIGNAL (60.0%) Q=57 4287ms
 
-  Done. 3 rounds, 142.50 VOID est., 1 discoveries.</code></pre>
+ Done. 3 rounds, 142.50 VOID est., 1 discoveries.</code></pre>
 
-    <div class="tip">
-      <strong>★ DISCOVERY!</strong> means the model is ≥85% confident it found a real exoplanet. The miner will play a sound and you can generate a Discovery Card.
-    </div>
-  </div>
+<div class="tip"><strong>★ DISCOVERY!</strong> means the model is ≥85% confident it found a real exoplanet. The miner will play a sound and you can generate a Discovery Card.</div>
+</div>
 
-  <div class="step" id="step5">
-    <div class="step-header">
-      <div class="step-number">5</div>
-      <div class="step-title">Submit on-chain</div>
-    </div>
-    <p class="step-time">⏱ 5 minutes for first transaction</p>
+<div class="step" id="step5">
+<div class="step-header">
+<div class="step-number">5</div>
+<div class="step-title">Submit on-chain</div>
+</div>
+<p class="step-time">5 minutes for first transaction</p>
+<p>By default, results are saved locally. To earn VOID tokens, submit them on-chain:</p>
 
-    <p>By default, results are saved locally. To earn VOID tokens, submit them on-chain:</p>
-
-    <pre><code>voidmap-mine --task exoplanet --rounds 10 --submit \
+<pre><code>voidmap-mine --task exoplanet --rounds 10 --submit \
   --rpc https://mainnet.base.org \
   --pk $VOIDMAP_PK</code></pre>
 
-    <p>Each round:</p>
-    <ol>
-      <li>Mines the data (~5 seconds on RTX 3080)</li>
-      <li>Computes hashes and prepares the transaction</li>
-      <li>Waits 12 seconds (on-chain cooldown per miner)</li>
-      <li>Submits to the MiningPool contract</li>
-      <li>Mints VOID to your wallet based on quality + halving + elastic</li>
-    </ol>
+<p>Each round:</p>
+<ol>
+<li>Mines the data (~5 seconds on RTX 3080)</li>
+<li>Computes hashes and prepares the transaction</li>
+<li>Waits 12 seconds (on-chain cooldown per miner)</li>
+<li>Submits to the MiningPool contract</li>
+<li>Mints VOID to your wallet based on quality + halving + elastic</li>
+</ol>
 
-    <h3>Track your submissions</h3>
-    <p>Each submission is recorded in the on-chain <strong>Result Registry</strong>. View your work at:</p>
-    <ul>
-      <li><a href="explorer/">explorer.voidmap.org</a></li>
-      <li><a href="https://basescan.org" target="_blank">BaseScan</a></li>
-    </ul>
-  </div>
+<h3>Track your submissions</h3>
+<p>Each submission is recorded in the on-chain <strong>Result Registry</strong>. View your work at:</p>
+<ul>
+<li><a href="explorer/">Voidmap Explorer</a></li>
+<li><a href="https://basescan.org" target="_blank">BaseScan</a></li>
+</ul>
+</div>
 
-  <div class="step" id="step6">
-    <div class="step-header">
-      <div class="step-number">6</div>
-      <div class="step-title">Keep mining</div>
-    </div>
-    <p class="step-time">⏱ Forever</p>
+<div class="step" id="step6">
+<div class="step-header">
+<div class="step-number">6</div>
+<div class="step-title">Keep mining</div>
+</div>
+<p class="step-time">Forever</p>
 
-    <h3>Run it in the background</h3>
+<h3>Run it in the background</h3>
 
-    <h4>Linux / macOS</h4>
-    <pre><code>nohup voidmap-mine --task all --submit \
+<h4>Linux / macOS</h4>
+<pre><code>nohup voidmap-mine --task all --submit \
   --rpc https://mainnet.base.org \
   --pk $VOIDMAP_PK \
   > ~/.voidmap/miner.log 2>&1 &</code></pre>
 
-    <h4>Windows (PowerShell)</h4>
-    <pre><code>Start-Process voidmap-mine -ArgumentList "--task","all","--submit","--rpc","https://mainnet.base.org","--pk","$env:VOIDMAP_PK" -WindowStyle Hidden</code></pre>
+<h4>Windows (PowerShell)</h4>
+<pre><code>Start-Process voidmap-mine -ArgumentList "--task","all","--submit","--rpc","https://mainnet.base.org","--pk","$env:VOIDMAP_PK" -WindowStyle Hidden</code></pre>
 
-    <h4>systemd service (Linux)</h4>
-    <pre><code>sudo tee /etc/systemd/system/voidmap.service > /dev/null &lt;&lt;EOF
+<h4>systemd service (Linux)</h4>
+<pre><code>sudo tee /etc/systemd/system/voidmap.service > /dev/null &lt;&lt;EOF
 [Unit]
 Description=Voidmap Miner
 After=network.target
@@ -491,154 +421,86 @@ sudo systemctl enable voidmap
 sudo systemctl start voidmap
 sudo systemctl status voidmap</code></pre>
 
-    <h3>HiveOS (mining rig)</h3>
-    <pre><code>curl -fsSL https://raw.githubusercontent.com/thekillsquad007/voidmap/main/install_hiveos.sh | sudo bash</code></pre>
+<h3>HiveOS (mining rig)</h3>
+<pre><code>curl -fsSL https://raw.githubusercontent.com/thekillsquad007/voidmap/main/install_hiveos.sh | sudo bash</code></pre>
+<p>The installer auto-detects your GPU vendor, installs the right PyTorch (CUDA for NVIDIA, ROCm for AMD), creates a <code>voidmap</code> wrapper, and sets up a systemd service.</p>
 
-    <p>The installer auto-detects your GPU vendor, installs the right PyTorch (CUDA for NVIDIA, ROCm for AMD), creates a <code>voidmap</code> wrapper, and sets up a systemd service.</p>
+<h3>Docker (any platform)</h3>
+<p>See <a href="https://github.com/thekillsquad007/voidmap/blob/main/docker-compose.yml" target="_blank">docker-compose.yml</a> for NVIDIA + AMD profiles.</p>
+</div>
 
-    <h3>Docker (any platform)</h3>
-    <p>See <a href="https://github.com/thekillsquad007/voidmap/blob/main/docker-compose.yml" target="_blank">docker-compose.yml</a> for NVIDIA + AMD profiles.</p>
-  </div>
+<div class="step" id="troubleshoot">
+<div class="step-header">
+<div class="step-number">?</div>
+<div class="step-title">Troubleshooting</div>
+</div>
 
-  <div class="step" id="troubleshoot">
-    <div class="step-header">
-      <div class="step-number">?</div>
-      <div class="step-title">Troubleshooting</div>
-    </div>
+<h3>"Backend: onnx-cpu" when I have a GPU</h3>
+<div class="note">
+<strong>Cause:</strong> PyTorch didn't install with GPU support.<br>
+<strong>Fix (NVIDIA):</strong> <code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124</code><br>
+<strong>Fix (AMD):</strong> Install Python 3.10 or 3.11, then <code>pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm6.2</code>
+</div>
 
-    <h3>"Backend: onnx-cpu" when I have a GPU</h3>
-    <div class="note">
-      <strong>Cause:</strong> PyTorch didn't install with GPU support.<br>
-      <strong>Fix (NVIDIA):</strong> <code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124</code><br>
-      <strong>Fix (AMD):</strong> Install Python 3.10 or 3.11, then <code>pip install torch torchvision --index-url https://download.pytorch.org/whl/rocm6.2</code>
-    </div>
+<h3>"Cannot find cast"</h3>
+<div class="note">
+<strong>Cause:</strong> Foundry not installed.<br>
+<strong>Fix:</strong> <code>curl -L https://foundry.paradigm.xyz | bash &amp;&amp; foundryup</code>
+</div>
 
-    <h3>"Cannot find cast"</h3>
-    <div class="note">
-      <strong>Cause:</strong> Foundry not installed.<br>
-      <strong>Fix:</strong> <code>curl -L https://foundry.paradigm.xyz | bash &amp;&amp; foundryup</code>
-    </div>
+<h3>"No TESS data found for TIC X"</h3>
+<div class="note">
+<strong>Cause:</strong> The target doesn't have TESS observations, or MAST is down.<br>
+<strong>Fix:</strong> Try a different target, or wait and retry. The miner will fall back to synthetic data.
+</div>
 
-    <h3>"No TESS data found for TIC X"</h3>
-    <div class="note">
-      <strong>Cause:</strong> The target doesn't have TESS observations, or MAST is down.<br>
-      <strong>Fix:</strong> Try a different target, or wait and retry. The miner will fall back to synthetic data.
-    </div>
+<h3>"Cooldown" error on every submission</h3>
+<div class="note">
+<strong>Cause:</strong> The on-chain cooldown (12 seconds) is enforced.<br>
+<strong>Fix:</strong> This is normal — you can only submit one round every 12 seconds per miner.
+</div>
 
-    <h3>"Cooldown" error on every submission</h3>
-    <div class="note">
-      <strong>Cause:</strong> The on-chain cooldown (12 seconds) is enforced.<br>
-      <strong>Fix:</strong> This is normal — you can only submit one round every 12 seconds per miner.
-    </div>
+<h3>Need more help?</h3>
+<ul>
+<li><a href="https://github.com/thekillsquad007/voidmap" target="_blank">GitHub</a> — file an issue</li>
+<li><a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Documentation Wiki</a> — full reference</li>
+<li><a href="https://github.com/thekillsquad007/voidmap/wiki/AMD-ROCm-Setup" target="_blank">AMD/ROCm Setup Guide</a> — if you have an AMD GPU</li>
+</ul>
+</div>
 
-    <h3>Need more help?</h3>
-    <ul>
-      <li><a href="https://github.com/thekillsquad007/voidmap" target="_blank">GitHub</a> — file an issue</li>
-      <li><a href="https://github.com/thekillsquad007/voidmap/wiki" target="_blank">Documentation Wiki</a> — full reference</li>
-      <li><a href="https://github.com/thekillsquad007/voidmap/wiki/AMD-ROCm-Setup" target="_blank">AMD/ROCm Setup Guide</a> — if you have an AMD GPU</li>
-    </ul>
-  </div>
-
-  <h2>What's next?</h2>
-
-  <div class="next-steps">
-    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki">
-      <div class="next-step-title">📖 Read the docs</div>
-      <div class="next-step-desc">Deep dive on contracts, tokenomics, anti-ASIC</div>
-    </a>
-    <a class="next-step" href="explorer/">
-      <div class="next-step-title">🌟 See discoveries</div>
-      <div class="next-step-desc">Browse what other miners have found</div>
-    </a>
-    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki/Whitepaper">
-      <div class="next-step-title">📄 Whitepaper</div>
-      <div class="next-step-desc">Full protocol specification</div>
-    </a>
-    <a class="next-step" href="https://github.com/thekillsquad007/voidmap/blob/main/docs/arxiv-paper.md">
-      <div class="next-step-title">🔬 arXiv paper</div>
-      <div class="next-step-desc">Methods paper for academic citation</div>
-    </a>
-  </div>
+<h2>What's next?</h2>
+<div class="next-steps">
+<a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki">
+<div class="next-step-title">Read the docs</div>
+<div class="next-step-desc">Deep dive on contracts, tokenomics, anti-ASIC</div>
+</a>
+<a class="next-step" href="explorer/">
+<div class="next-step-title">See discoveries</div>
+<div class="next-step-desc">Browse what other miners have found</div>
+</a>
+<a class="next-step" href="https://github.com/thekillsquad007/voidmap/wiki/Whitepaper">
+<div class="next-step-title">Whitepaper</div>
+<div class="next-step-desc">Full protocol specification</div>
+</a>
+<a class="next-step" href="https://github.com/thekillsquad007/voidmap/blob/main/docs/arxiv-paper.md">
+<div class="next-step-title">arXiv paper</div>
+<div class="next-step-desc">Methods paper for academic citation</div>
+</a>
+</div>
 </main>
 
 <footer>
-  <p>Voidmap — Proof of Useful Work on Base L2</p>
-  <p>
-    <a href="index.html">Home</a> ·
-    <a href="howto.html">How to Mine</a> ·
-    <a href="explorer/">Explorer</a> ·
-    <a href="https://github.com/thekillsquad007/voidmap">GitHub</a> ·
-    <a href="https://github.com/thekillsquad007/voidmap/wiki">Wiki</a>
-  </p>
-  <p>No premine · No team · No admin keys · <a href="https://voidmap.org">voidmap.org</a></p>
+<p>Voidmap — Proof of Useful Work on Base L2</p>
+<p>
+<a href="index.html">Home</a> ·
+<a href="howto.html">How to Mine</a> ·
+<a href="explorer/">Explorer</a> ·
+<a href="https://github.com/thekillsquad007/voidmap">GitHub</a> ·
+<a href="https://github.com/thekillsquad007/voidmap/wiki">Wiki</a>
+</p>
+<p>No premine · No team · No admin keys</p>
 </footer>
 
 </div>
-
-<script>
-// 3-layer parallax starfield (matches index.html)
-const starsCanvas = [
-  document.getElementById('stars'),
-  document.getElementById('stars2'),
-  document.getElementById('stars3')
-];
-const contexts = starsCanvas.map(c => c.getContext('2d'));
-const starLayers = [[], [], []];
-const starCounts = [80, 140, 240];
-const starSpeeds = [0.05, 0.12, 0.25];
-const starSizes = [0.4, 0.7, 1.1];
-
-function resize() {
-  starsCanvas.forEach(c => { c.width = innerWidth; c.height = innerHeight; });
-}
-resize();
-addEventListener('resize', resize);
-
-for (let i = 0; i < 3; i++) {
-  for (let j = 0; j < starCounts[i]; j++) {
-    starLayers[i].push({
-      x: Math.random() * innerWidth,
-      y: Math.random() * innerHeight,
-      r: Math.random() * starSizes[i] + 0.3,
-      a: Math.random() * 0.6 + 0.2,
-      tw: Math.random() * Math.PI * 2,
-      dx: (Math.random() - 0.5) * starSpeeds[i],
-      dy: (Math.random() - 0.5) * starSpeeds[i]
-    });
-  }
-}
-
-let t = 0;
-function draw() {
-  t += 0.016;
-  contexts.forEach((ctx, i) => {
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    for (const s of starLayers[i]) {
-      s.x += s.dx;
-      s.y += s.dy;
-      if (s.x < 0) s.x = innerWidth;
-      if (s.x > innerWidth) s.x = 0;
-      if (s.y < 0) s.y = innerHeight;
-      if (s.y > innerHeight) s.y = 0;
-      const twinkle = 0.7 + Math.sin(t * 1.5 + s.tw) * 0.3;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${i === 2 ? '255,255,255' : '180,210,255'},${s.a * twinkle})`;
-      ctx.fill();
-    }
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-});
-</script>
 </body>
 </html>
