@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>◇</text></svg>">
 <title>Voidmap Explorer — Mission Telemetry</title>
 <meta name="description" content="Explore real exoplanet candidates, galaxy classifications, and anomaly detections computed by the Voidmap network.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +67,7 @@ nav .telemetry .val{color:var(--cyan)}
 nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.25rem;font-weight:500;transition:color 0.2s}
 nav .nav-links a:hover{color:var(--cyan)}
 
-main{max-width:1400px;margin:0 auto;padding:0 2rem 3rem;position:relative}
+main{max-width:1400px;margin:0 auto;padding:3.5rem 2rem 3rem;position:relative}
 .mission-id{
   font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;
   text-transform:uppercase;color:var(--cyan);margin-bottom:0.5rem;
@@ -233,7 +234,7 @@ footer a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 
 @media (max-width:980px){
   nav .telemetry{display:none}
-  main{padding:0 1.25rem 2rem}
+  main{padding:3rem 1.25rem 2rem}
 }
 @media (max-width:768px){
   nav .nav-links a{margin-left:0.75rem;font-size:0.8rem}
@@ -244,10 +245,10 @@ footer a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 </style>
 </head>
 <body>
+<div class="wrap">
 <canvas id="stars"></canvas>
 <canvas id="stars2"></canvas>
 <canvas id="stars3"></canvas>
-<div class="wrap">
 
 <nav>
   <a class="logo" href="index.html">VOIDMAP&nbsp;EXPLORER</a>

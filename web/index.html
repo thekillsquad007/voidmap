@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>◇</text></svg>">
 <title>Voidmap — Proof of Useful Work</title>
 <meta name="description" content="GPU miners process real astronomical data from NASA, ESA, and NSF surveys. Every hash contributes to science. No founder, no owner, no promises.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,13 +38,14 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  background:var(--bg);
-  color:var(--fg);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
-  overflow-x:hidden;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-  font-feature-settings:'cv11','ss01';
+background:var(--bg);
+color:var(--fg);
+font-family:'Inter',system-ui,-apple-system,sans-serif;
+overflow-x:hidden;
+line-height:1.5;
+-webkit-font-smoothing:antialiased;
+font-feature-settings:'cv11','ss01';
+margin:0;
 }
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -51,7 +53,7 @@ body::before{
 }
 .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace}
 canvas#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
-.content{position:relative;z-index:1}
+.content{position:relative;z-index:1;min-height:0}
 
 /* NAV */
 nav{
@@ -83,7 +85,7 @@ nav .telemetry .val{color:var(--cyan)}
 nav .nav-links a{color:var(--fg2);text-decoration:none;margin-left:1.25rem;font-weight:500;transition:color 0.2s}
 nav .nav-links a:hover{color:var(--cyan)}
 
-.container{max-width:1280px;margin:0 auto;padding:0 2rem 2rem;position:relative}
+.container{max-width:1280px;margin:0 auto;padding:3.5rem 2rem 2rem;position:relative}
 
 /* HERO */
 .hero{
@@ -381,7 +383,7 @@ footer .links a:hover{color:var(--cyan)}
 }
 @media (max-width:768px){
   nav .nav-links{display:none}
-	.container{padding:0 1rem 2rem}
+	.container{padding:3rem 1rem 2rem}
 	.hero{padding:0}
   .partners{justify-content:flex-start;gap:1rem;font-size:0.85rem}
   .telemetry-grid{grid-template-columns:1fr 1fr}
@@ -389,10 +391,10 @@ footer .links a:hover{color:var(--cyan)}
 </style>
 </head>
 <body>
+<div class="content">
 <canvas id="stars"></canvas>
 <canvas id="stars2"></canvas>
 <canvas id="stars3"></canvas>
-<div class="content">
 <nav>
   <div class="logo"><span class="mark">◇</span>VOIDMAP</div>
   <div class="telemetry">
