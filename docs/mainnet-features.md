@@ -1,6 +1,6 @@
 # Mainnet Features
 
-This document describes the four core mechanisms that make Voidmap mainnet-grade: **Halving**, **Elastic Mint**, **Challenge/Slash**, and **Time-Locked Governance**. All four are enforced in immutable, ownerless smart contracts.
+This document describes the four core mechanisms that make Voidmap mainnet-grade: **Halving**, **Elastic Mint**, **Challenge/Slash**, and **Time-Locked Governance**. All four are enforced in the native Rust consensus (φ-PoW).
 
 ---
 
@@ -466,24 +466,22 @@ The contracts are immutable from day one. The only way to change the protocol is
 
 ## Testing
 
-All four mechanisms are covered by 48 forge tests. Run them with:
+All four mechanisms are covered by Rust unit tests. Run them with:
 
 ```bash
-cd contracts
-forge test -vvv
+cd voidmap-chain
+cargo test
 ```
 
 Test coverage:
 - **Halving**: Epoch transitions, reward halving, floor enforcement
 - **Elastic Mint**: Quality ring buffer, dead zone, dampener, boost, cap
 - **Challenge/Slash**: File, resolve, self-challenge prevention, double-challenge prevention, expired window, slashed stats tracking
-- **Time-Lock**: Stake, propose, execute after delay, cancel, unstake, under-quorum prevention
+- **Difficulty Validation**: Blocks verified against adjustment algorithm
 
 ---
 
 ## See Also
 
-- [Tokenomics](tokenomics.md) — Halving schedule + elastic math
-- [Smart Contracts](contracts.md) — Full contract API
-- [Proof of Useful Work](pouw.md) — Quality scoring
-- [Anti-ASIC](anti-asic.md) — Why this can't be ASIC'd
+- [Mining Guide](mining.md) — How to mine and run a node
+- [Data Sources](data-sources.md) — Where the astronomical data comes from
