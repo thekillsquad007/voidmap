@@ -637,11 +637,11 @@ Total gas: ~3.5M gas (~0.00007 ETH at 19 Gwei on Base).
 
 ```bash
 # Verify VoidmapToken
-forge verify-contract <TOKEN_ADDRESS> VoidmapToken.sol:VoidmapToken \
+forge verify-contract <TOKEN_ADDRESS> src/VoidmapToken.sol:VoidmapToken \
   --verifier blockscout --verifier-url https://api.basescan.org/api
 
 # Verify MiningPool
-forge verify-contract <POOL_ADDRESS> MiningPool.sol:MiningPool \
+forge verify-contract <POOL_ADDRESS> src/MiningPool.sol:MiningPool \
   --verifier blockscout --verifier-url https://api.basescan.org/api
 ```
 

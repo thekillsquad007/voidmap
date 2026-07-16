@@ -1,0 +1,22 @@
+[package]
+name = "voidmap-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "voidmap-node"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+clap.workspace = true
+rand.workspace = true
+blake3.workspace = true
+hex.workspace = true
+tokio.workspace = true
+voidmap-core = { path = "../core" }
+voidmap-crypto = { path = "../crypto" }
+voidmap-pow = { path = "../pow" }
+voidmap-network = { path = "../network" }

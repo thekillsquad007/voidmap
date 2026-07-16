@@ -1,0 +1,13 @@
+[package]
+name = "voidmap-crypto"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+hex.workspace = true
+rand.workspace = true
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+blake3.workspace = true
+thiserror.workspace = true

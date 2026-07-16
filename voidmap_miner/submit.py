@@ -11,9 +11,10 @@ from typing import Optional
 from .engine import MineResult
 
 
-# Default contract addresses
+# Default contract addresses — overridden by env vars or CLI args
 DEFAULT_TOKEN_BASE = "0x8AF20228A724d7420434791EAEA5F7D037865d35"  # Base Sepolia
 DEFAULT_POOL_BASE = "0x3768e25aFc129D4455e267819801f2b2914fA4A2"    # Base Sepolia
+DEFAULT_TASK_ID = 1  # Task IDs are 1-indexed; 0 is invalid
 
 
 def _find_cast() -> str:
@@ -67,17 +68,24 @@ def submit_result(result: MineResult, rpc: str, pk: str,
         pool = DEFAULT_POOL_BASE
 
     # Build parameters for submitWork()
-    # (taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs)
-    task_id = 0  # Default task; in production, look up active task
+    # Task ID defaults to 1 (first task). In production, query active task from pool.
+    task_id = result.task_id or DEFAULT_TASK_ID
     ipfs_cid = ipfs_cid or result.ipfs_cid or ""
     if not ipfs_cid:
-        # Fall back to sha256 of the result file
         ipfs_cid = f"sha256:{result.output_hash.replace('0x', '')}"
 
-    # Submit via cast
+    # Submit via cast — individual params (NOT tuple struct)
+    # submitWork(uint256 taskId, bytes32 inputHash, bytes32 outputHash, bytes32 modelHash, string ipfsCID, uint256 quality, uint256 samples, uint256 durationMs)
     args = [
-        "send", pool, "submitWork((uint256,bytes32,bytes32,bytes32,string,uint256,uint256,uint256))",
-        f"({task_id},{result.input_hash},{result.output_hash},{result.model_hash},\"{ipfs_cid}\",{result.quality_score},{result.samples},{result.duration_ms})",
+        "send", pool, "submitWork(uint256,bytes32,bytes32,bytes32,string,uint256,uint256,uint256)",
+        str(task_id),
+        result.input_hash,
+        result.output_hash,
+        result.model_hash,
+        ipfs_cid,
+        str(result.quality_score),
+        str(result.samples),
+        str(result.duration_ms),
         "--rpc-url", rpc,
         "--private-key", pk,
         "--json",

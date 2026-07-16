@@ -8,6 +8,8 @@ Architecture matches sarojpatil16/exoplanet-transit-detector on HuggingFace:
 from __future__ import annotations
 import torch
 import torch.nn as nn
+from huggingface_hub import hf_hub_download
+import os
 
 
 class FluxBranch1D(nn.Module):
@@ -96,3 +98,17 @@ class AstroNetCNN(nn.Module):
         sc = self.scalar_branch(self.scalar_norm(scalars))
         x = torch.cat([fg, fl, fo, fe, sc], dim=1)
         return self.classifier(x)
+
+    def load_weights(self, repo_id: str = "sarojpatil16/exoplanet-transit-detector", filename: str = "model.pth"):
+        """Download and load pre-trained weights from HuggingFace."""
+        try:
+            path = hf_hub_download(repo_id=repo_id, filename=filename)
+            state_dict = torch.load(path, map_location="cpu")
+            if "state_dict" in state_dict:
+                state_dict = state_dict["state_dict"]
+            clean_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+            self.load_state_dict(clean_dict, strict=False)
+            return True
+        except Exception as e:
+            print(f"Weight load failed: {e}")
+            return False

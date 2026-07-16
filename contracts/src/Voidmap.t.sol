@@ -167,7 +167,7 @@ contract MiningPoolTest is Test {
     function test_createTaskRejectsNonProposer() public {
         _bootstrapMiner1();
         vm.prank(miner1);
-        vm.expectRevert("Not a proposer");
+        vm.expectRevert(MiningPool.NotProposer.selector);
         pool.createTask("Exoplanet", "MAST", "Model");
     }
 
@@ -207,7 +207,7 @@ contract MiningPoolTest is Test {
         pool.createTask("Exoplanet Transit", "MAST TESS", "AstroNetCNN");
 
         vm.prank(miner1);
-        vm.expectRevert("Quality too low (< 50)");
+        vm.expectRevert(MiningPool.QualityTooLow.selector);
         pool.submitWork(
             1,
             keccak256("input"),
@@ -228,7 +228,7 @@ contract MiningPoolTest is Test {
         pool.createTask("Exoplanet Transit", "MAST TESS", "AstroNetCNN");
 
         vm.prank(miner1);
-        vm.expectRevert("Quality > 100");
+        vm.expectRevert(MiningPool.QualityTooHigh.selector);
         pool.submitWork(
             1,
             keccak256("input"),
@@ -251,7 +251,7 @@ contract MiningPoolTest is Test {
         pool.deactivateTask(taskId);
 
         vm.prank(miner1);
-        vm.expectRevert("Task inactive");
+        vm.expectRevert(MiningPool.TaskInactive.selector);
         pool.submitWork(
             taskId,
             keccak256("input"),
@@ -311,7 +311,7 @@ contract MiningPoolTest is Test {
         pool.submitWork(1, keccak256("i"), keccak256("o"), keccak256("m"), "Qm1", 75, 100, 1000);
 
         vm.prank(miner1);
-        vm.expectRevert("Cooldown");
+        vm.expectRevert(MiningPool.CooldownActive.selector);
         pool.submitWork(1, keccak256("i2"), keccak256("o2"), keccak256("m2"), "Qm2", 75, 100, 1000);
 
         vm.warp(block.timestamp + 13);
@@ -361,7 +361,7 @@ contract MiningPoolTest is Test {
         pool.addPoolMember(poolId, miner1);
 
         vm.prank(miner2);
-        vm.expectRevert("Not pool operator");
+        vm.expectRevert(MiningPool.NotPoolOperator.selector);
         pool.submitPoolWork(
             poolId, 1, miner1,
             keccak256("input"), keccak256("output"), keccak256("model"),
@@ -380,7 +380,7 @@ contract MiningPoolTest is Test {
         uint256 poolId = pool.createPool("TestPool", feeRecipient);
 
         vm.prank(poolOperator);
-        vm.expectRevert("Not pool member");
+        vm.expectRevert(MiningPool.NotPoolMember.selector);
         pool.submitPoolWork(
             poolId, 1, miner1,
             keccak256("input"), keccak256("output"), keccak256("model"),
@@ -465,7 +465,7 @@ contract MiningPoolTest is Test {
         pool.createTask("Exoplanet Transit", "MAST TESS", "AstroNetCNN");
 
         vm.prank(miner1);
-        vm.expectRevert("IPFS CID required");
+        vm.expectRevert(MiningPool.IpfsCidRequired.selector);
         pool.submitWork(
             1, keccak256("input"), keccak256("output"), keccak256("model"),
             "", 75, 100, 5000
@@ -480,7 +480,7 @@ contract MiningPoolTest is Test {
         pool.createTask("Exoplanet Transit", "MAST TESS", "AstroNetCNN");
 
         vm.prank(miner1);
-        vm.expectRevert("Samples > 0");
+        vm.expectRevert(MiningPool.NoSamples.selector);
         pool.submitWork(
             1, keccak256("input"), keccak256("output"), keccak256("model"),
             "QmTest", 75, 0, 5000
@@ -568,7 +568,7 @@ contract MiningPoolTest is Test {
         pool.submitWork(1, keccak256("i"), keccak256("o"), keccak256("m"), "Qm1", 75, 100, 1000);
 
         vm.prank(miner1);
-        vm.expectRevert("Cannot challenge yourself");
+        vm.expectRevert(MiningPool.SelfChallenge.selector);
         pool.fileChallenge(1);
     }
 
@@ -587,7 +587,7 @@ contract MiningPoolTest is Test {
         vm.prank(miner2);
         pool.fileChallenge(1);
         vm.prank(miner2);
-        vm.expectRevert("Already challenged");
+        vm.expectRevert(MiningPool.AlreadyChallenged.selector);
         pool.fileChallenge(1);
     }
 
@@ -605,7 +605,7 @@ contract MiningPoolTest is Test {
 
         vm.warp(block.timestamp + pool.CHALLENGE_WINDOW() + 1);
         vm.prank(miner2);
-        vm.expectRevert("Challenge window expired");
+        vm.expectRevert(MiningPool.ChallengeWindowExpired.selector);
         pool.fileChallenge(1);
     }
 
@@ -663,7 +663,7 @@ contract MiningPoolTest is Test {
     function test_proposeTimelockRejectsNonProposer() public {
         _bootstrapMiner1();
         vm.prank(miner1);
-        vm.expectRevert("Not a proposer");
+        vm.expectRevert(MiningPool.NotProposer.selector);
         pool.proposeTimelock(keccak256("test"));
     }
 
@@ -676,7 +676,7 @@ contract MiningPoolTest is Test {
         bytes32 proposalId = pool.proposeTimelock(dataHash);
 
         // Can't execute before delay
-        vm.expectRevert("Timelock not elapsed");
+        vm.expectRevert(MiningPool.TimelockNotElapsed.selector);
         pool.executeTimelock(proposalId);
 
         vm.warp(block.timestamp + pool.TIMELOCK_DELAY() + 1);

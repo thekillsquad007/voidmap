@@ -14,6 +14,7 @@ import os
 import platform
 import shutil
 import subprocess
+import psutil
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
@@ -65,6 +66,45 @@ class HardwareInfo:
         if self.is_hiveos:
             s += " (HiveOS)"
         return s
+
+    def is_system_idle(self, cpu_threshold: float = 15.0, gpu_threshold: float = 10.0) -> bool:
+        """Check if the system is idle enough to mine.
+        Returns True if CPU and GPU usage are below thresholds.
+        """
+        cpu_usage = psutil.cpu_percent(interval=0.1)
+        if cpu_usage > cpu_threshold:
+            return False
+        
+        # GPU usage detection (backend dependent)
+        if self.gpu == GPU.NVIDIA:
+            try:
+                # Use nvidia-smi to get utilization
+                out = subprocess.check_output(
+                    ["nvidia-smi", "--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"],
+                    timeout=2, stderr=subprocess.DEVNULL
+                ).decode().strip()
+                if float(out.split("\n")[0]) > gpu_threshold:
+                    return False
+            except Exception:
+                pass
+        elif self.gpu == GPU.AMD:
+            try:
+                # Use rocm-smi
+                rocm_smi = shutil.which("rocm-smi") or "/opt/rocm/bin/rocm-smi"
+                out = subprocess.check_output(
+                    [rocm_smi, "--showuse"],
+                    timeout=2, stderr=subprocess.DEVNULL
+                ).decode()
+                # Parse "GPU Use: 5%"
+                for line in out.split("\n"):
+                    if "GPU Use" in line:
+                        usage = float(line.split(":")[1].strip().replace("%", ""))
+                        if usage > gpu_threshold:
+                            return False
+            except Exception:
+                pass
+        
+        return True
 
 
 def _detect_gpu() -> tuple[GPU, str]:

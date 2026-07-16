@@ -445,6 +445,17 @@ class TUIMiner:
                 while self.running:
                     if self.rounds_total > 0 and self.round_count >= self.rounds_total:
                         break
+                    
+                    # Idle Mode: Check if system is idle before mining
+                    if self.idle_mode:
+                        if not self.engine.hw.is_system_idle():
+                            self.paused = True
+                            live.update(self._render())
+                            time.sleep(5)
+                            continue
+                        else:
+                            self.paused = False
+
                     if not self.paused:
                         # Mine one round
                         self._mine_one()

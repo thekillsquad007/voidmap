@@ -15,7 +15,7 @@ This is the deployment checklist for Voidmap mainnet on Base L2. **Do not deploy
 - [x] `MiningPool` has time-locked governance (7-day delay, 1% quorum)
 - [x] `ResultRegistry` is autonomous (renounceable owner, recorder allowlist)
 - [x] `MiningPool` calls `registry.recordResult()` after each submission
-- [x] All 62 forge tests passing
+- [x] All 62 forge tests passing (counted: `function test_` = 62)
 - [x] E2E live tests passing
 - [x] Multi-backend GPU support (NVIDIA, AMD, Apple, Intel, CPU)
 - [x] HiveOS Docker image
@@ -102,15 +102,15 @@ forge test -vv
 
 ```bash
 # Token
-forge verify-contract $TOKEN_ADDR VoidmapToken.sol:VoidmapToken \
+forge verify-contract $TOKEN_ADDR src/VoidmapToken.sol:VoidmapToken \
   --verifier blockscout --verifier-url https://api.basescan.org/api
 
 # Pool
-forge verify-contract $POOL_ADDR MiningPool.sol:MiningPool \
+forge verify-contract $POOL_ADDR src/MiningPool.sol:MiningPool \
   --verifier blockscout --verifier-url https://api.basescan.org/api
 
 # Registry
-forge verify-contract $REGISTRY_ADDR ResultRegistry.sol:ResultRegistry \
+forge verify-contract $REGISTRY_ADDR src/ResultRegistry.sol:ResultRegistry \
   --verifier blockscout --verifier-url https://api.basescan.org/api
 ```
 

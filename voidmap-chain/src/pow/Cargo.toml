@@ -1,0 +1,15 @@
+[package]
+name = "voidmap-pow"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+bincode.workspace = true
+blake3.workspace = true
+num-bigint = { version = "0.4", features = ["serde"] }
+num-traits = "0.2"
+rand = { version = "0.8", features = ["small_rng"] }
+voidmap-core = { path = "../core" }
+voidmap-crypto = { path = "../crypto" }

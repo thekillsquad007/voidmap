@@ -168,6 +168,42 @@ contract MiningPool is ReentrancyGuard {
     uint256 public taskCount;
     uint256 public poolCount;
 
+    // ─── Errors ───────────────────────────────────────────────────
+    error InvalidTask();
+    error TaskInactive();
+    error QualityTooLow();
+    error QualityTooHigh();
+    error NoSamples();
+    error ComputeTooFast();
+    error IpfsCidRequired();
+    error CooldownActive();
+    error InvalidPool();
+    error NotPoolOperator();
+    error NotPoolMember();
+    error SelfSubmit();
+    error AlreadyMember();
+    error NotMember();
+    error NoFees();
+    error InvalidFeeRecipient();
+    error InvalidMiner();
+    error AlreadyChallenged();
+    error AlreadyResolved();
+    error ChallengeWindowExpired();
+    error SelfChallenge();
+    error InvalidChallenge();
+    error ResolutionTooEarly();
+    error ZeroStake();
+    error NotProposer();
+    error StakeExceeded();
+    error NoMinerSupply();
+    error BelowQuorum();
+    error EmptyData();
+    error UnknownProposal();
+    error ProposalExecuted();
+    error ProposalCancelled();
+    error TimelockNotElapsed();
+    error NotProposerCancel();
+
     // ─── Events ──────────────────────────────────────────────────
     event WorkSubmitted(
         uint256 indexed submissionId,
@@ -222,7 +258,7 @@ contract MiningPool is ReentrancyGuard {
 
     function deactivateTask(uint256 taskId) external {
         _requireProposer();
-        require(taskId > 0 && taskId <= taskCount, "Invalid task");
+        if (taskId == 0 || taskId > taskCount) revert InvalidTask();
         tasks[taskId].active = false;
         emit TaskDeactivated(taskId);
     }
@@ -230,7 +266,7 @@ contract MiningPool is ReentrancyGuard {
     // ─── Pool Management ──────────────────────────────────────────
 
     function createPool(string calldata name, address feeRecipient) external returns (uint256) {
-        require(feeRecipient != address(0), "Invalid fee recipient");
+        if (feeRecipient == address(0)) revert InvalidFeeRecipient();
         poolCount++;
         Pool storage pool = pools[poolCount];
         pool.operator = msg.sender;
@@ -245,11 +281,11 @@ contract MiningPool is ReentrancyGuard {
     }
 
     function addPoolMember(uint256 poolId, address miner) external {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
-        require(pools[poolId].operator == msg.sender, "Not pool operator");
-        require(miner != address(0), "Invalid miner");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
+        if (pools[poolId].operator != msg.sender) revert NotPoolOperator();
+        if (miner == address(0)) revert InvalidMiner();
         Pool storage pool = pools[poolId];
-        require(!pool.isMember[miner], "Already member");
+        if (pool.isMember[miner]) revert AlreadyMember();
 
         pool.isMember[miner] = true;
         pool.members.push(miner);
@@ -257,10 +293,10 @@ contract MiningPool is ReentrancyGuard {
     }
 
     function removePoolMember(uint256 poolId, address miner) external {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
-        require(pools[poolId].operator == msg.sender, "Not pool operator");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
+        if (pools[poolId].operator != msg.sender) revert NotPoolOperator();
         Pool storage pool = pools[poolId];
-        require(pool.isMember[miner], "Not member");
+        if (!pool.isMember[miner]) revert NotMember();
 
         pool.isMember[miner] = false;
         uint256 shares = pool.memberShares[miner];
@@ -274,17 +310,17 @@ contract MiningPool is ReentrancyGuard {
     }
 
     function withdrawPoolFees(uint256 poolId) external nonReentrant {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
         Pool storage pool = pools[poolId];
-        require(pool.operator == msg.sender, "Not pool operator");
+        if (pool.operator != msg.sender) revert NotPoolOperator();
         uint256 amount = pool.totalFeeAccumulated;
-        require(amount > 0, "No fees to withdraw");
+        if (amount == 0) revert NoFees();
         pool.totalFeeAccumulated = 0;
         token.mintMinerReward(pool.feeRecipient, amount, 0, 0);
     }
 
     function getPoolMembers(uint256 poolId) external view returns (address[] memory) {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
         return pools[poolId].members;
     }
 
@@ -296,7 +332,7 @@ contract MiningPool is ReentrancyGuard {
         uint256 memberCount,
         bool active
     ) {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
         Pool storage pool = pools[poolId];
         return (pool.name, pool.operator, pool.totalFeeAccumulated, pool.totalSubmissions, pool.members.length, pool.active);
     }
@@ -328,10 +364,10 @@ contract MiningPool is ReentrancyGuard {
         uint256 samples,
         uint256 durationMs
     ) external nonReentrant returns (uint256) {
-        require(poolId > 0 && poolId <= poolCount, "Invalid pool");
-        require(pools[poolId].operator == msg.sender, "Not pool operator");
-        require(pools[poolId].isMember[miner], "Not pool member");
-        require(miner != msg.sender, "Cannot submit for yourself");
+        if (poolId == 0 || poolId > poolCount) revert InvalidPool();
+        if (pools[poolId].operator != msg.sender) revert NotPoolOperator();
+        if (!pools[poolId].isMember[miner]) revert NotPoolMember();
+        if (miner == msg.sender) revert SelfSubmit();
         return _submitWork(miner, taskId, inputHash, outputHash, modelHash, ipfsCID, quality, samples, durationMs, poolId);
     }
 
@@ -347,17 +383,16 @@ contract MiningPool is ReentrancyGuard {
         uint256 durationMs,
         uint256 poolId
     ) internal returns (uint256) {
-        require(taskId > 0 && taskId <= taskCount, "Invalid task");
-        require(tasks[taskId].active, "Task inactive");
-        require(quality >= MIN_QUALITY, "Quality too low (< 50)");
-        require(quality <= MAX_QUALITY, "Quality > 100");
-        require(samples > 0, "Samples > 0");
-        require(durationMs >= MIN_COMPUTE_DURATION, "Compute too fast (ASIC?)");
-        require(bytes(ipfsCID).length > 0, "IPFS CID required");
-        require(
-            lastSubmissionTime[miner] == 0 || lastSubmissionTime[miner] + SUBMISSION_COOLDOWN <= block.timestamp,
-            "Cooldown"
-        );
+        if (taskId == 0 || taskId > taskCount) revert InvalidTask();
+        if (!tasks[taskId].active) revert TaskInactive();
+        if (quality < MIN_QUALITY) revert QualityTooLow();
+        if (quality > MAX_QUALITY) revert QualityTooHigh();
+        if (samples == 0) revert NoSamples();
+        if (durationMs < MIN_COMPUTE_DURATION) revert ComputeTooFast();
+        if (bytes(ipfsCID).length == 0) revert IpfsCidRequired();
+        if (lastSubmissionTime[miner] != 0 && lastSubmissionTime[miner] + SUBMISSION_COOLDOWN > block.timestamp) {
+            revert CooldownActive();
+        }
 
         // Deterministic noise from inputHash to quality to prevent gaming
         uint256 noise = uint256(keccak256(abi.encodePacked(inputHash, outputHash, block.timestamp))) % 10;
@@ -449,12 +484,12 @@ contract MiningPool is ReentrancyGuard {
      *         bond is forfeited.
      */
     function fileChallenge(uint256 submissionId) external nonReentrant {
-        require(submissionId > 0 && submissionId <= submissionCount, "Invalid submission");
-        require(submissionChallengeId[submissionId] == 0, "Already challenged");
+        if (submissionId == 0 || submissionId > submissionCount) revert InvalidPool();
+        if (submissionChallengeId[submissionId] != 0) revert AlreadyChallenged();
         Submission storage sub = submissions[submissionId];
-        require(!sub.resolved, "Already resolved");
-        require(block.timestamp <= sub.timestamp + CHALLENGE_WINDOW, "Challenge window expired");
-        require(msg.sender != sub.miner, "Cannot challenge yourself");
+        if (sub.resolved) revert AlreadyResolved();
+        if (block.timestamp > sub.timestamp + CHALLENGE_WINDOW) revert ChallengeWindowExpired();
+        if (msg.sender == sub.miner) revert SelfChallenge();
 
         // Lock bond by burning it (more economically sound than holding it)
         token.burnFromMiner(msg.sender, CHALLENGE_BOND);
@@ -486,10 +521,10 @@ contract MiningPool is ReentrancyGuard {
      *         For v2, this should be replaced with a re-execution oracle.
      */
     function resolveChallenge(uint256 challengeId) external nonReentrant {
-        require(challengeId > 0 && challengeId <= timelockProposalCount, "Invalid challenge");
+        if (challengeId == 0 || challengeId > timelockProposalCount) revert InvalidChallenge();
         Challenge storage ch = challenges[challengeId];
-        require(!ch.resolved, "Already resolved");
-        require(block.timestamp > ch.filedAt + 1 hours, "Resolution delay (1h)");
+        if (ch.resolved) revert AlreadyResolved();
+        if (block.timestamp <= ch.filedAt + 1 hours) revert ResolutionTooEarly();
 
         Submission storage sub = submissions[ch.submissionId];
 
@@ -607,28 +642,25 @@ contract MiningPool is ReentrancyGuard {
      *         miner-minted supply must propose any param change.
      */
     function stakeAsProposer(uint256 amount) external {
-        require(amount > 0, "Zero stake");
+        if (amount == 0) revert ZeroStake();
         proposers[msg.sender] = true;
         proposerStake[msg.sender] += amount;
         token.burnFromMiner(msg.sender, amount);
     }
 
     function unstakeProposer(uint256 amount) external {
-        require(proposers[msg.sender], "Not a proposer");
-        require(amount <= proposerStake[msg.sender], "Amount > stake");
+        if (!proposers[msg.sender]) revert NotProposer();
+        if (amount > proposerStake[msg.sender]) revert StakeExceeded();
         proposerStake[msg.sender] -= amount;
         if (proposerStake[msg.sender] == 0) proposers[msg.sender] = false;
         token.mintMinerReward(msg.sender, amount, 0, 0);
     }
 
     function _requireProposer() internal view {
-        require(proposers[msg.sender], "Not a proposer");
+        if (!proposers[msg.sender]) revert NotProposer();
         uint256 totalMinted = token.totalMinerMinted();
-        require(totalMinted > 0, "No miner supply yet");
-        require(
-            (proposerStake[msg.sender] * 10000) / totalMinted >= PROPOSER_QUORUM_BPS,
-            "Below quorum"
-        );
+        if (totalMinted == 0) revert NoMinerSupply();
+        if ((proposerStake[msg.sender] * 10000) / totalMinted < PROPOSER_QUORUM_BPS) revert BelowQuorum();
     }
 
     /**
@@ -637,7 +669,7 @@ contract MiningPool is ReentrancyGuard {
      */
     function proposeTimelock(bytes32 dataHash) external returns (bytes32) {
         _requireProposer();
-        require(dataHash != bytes32(0), "Empty data");
+        if (dataHash == bytes32(0)) revert EmptyData();
 
         timelockProposalCount++;
         bytes32 proposalId = keccak256(abi.encodePacked(timelockProposalCount, dataHash, msg.sender, block.timestamp));
@@ -656,10 +688,10 @@ contract MiningPool is ReentrancyGuard {
 
     function executeTimelock(bytes32 proposalId) external {
         TimelockProposal storage p = timelockProposals[proposalId];
-        require(p.eta > 0, "Unknown proposal");
-        require(!p.executed, "Already executed");
-        require(!p.cancelled, "Cancelled");
-        require(block.timestamp >= p.eta, "Timelock not elapsed");
+        if (p.eta == 0) revert UnknownProposal();
+        if (p.executed) revert ProposalExecuted();
+        if (p.cancelled) revert ProposalCancelled();
+        if (block.timestamp < p.eta) revert TimelockNotElapsed();
 
         p.executed = true;
         emit TimelockExecuted(proposalId);
@@ -671,9 +703,9 @@ contract MiningPool is ReentrancyGuard {
 
     function cancelTimelock(bytes32 proposalId) external {
         TimelockProposal storage p = timelockProposals[proposalId];
-        require(p.eta > 0, "Unknown proposal");
-        require(!p.executed, "Already executed");
-        require(msg.sender == p.proposer, "Not proposer");
+        if (p.eta == 0) revert UnknownProposal();
+        if (p.executed) revert ProposalExecuted();
+        if (msg.sender != p.proposer) revert NotProposerCancel();
         p.cancelled = true;
         emit TimelockCancelled(proposalId);
     }
@@ -693,7 +725,7 @@ contract MiningPool is ReentrancyGuard {
     // ─── Query Functions ──────────────────────────────────────────
 
     function getSubmission(uint256 id) external view returns (Submission memory) {
-        require(id > 0 && id <= submissionCount, "Invalid submission");
+        if (id == 0 || id > submissionCount) revert InvalidPool();
         return submissions[id];
     }
 
